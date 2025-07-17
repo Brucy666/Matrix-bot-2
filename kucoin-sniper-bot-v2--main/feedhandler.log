@@ -1,0 +1,1050 @@
+2025-07-16 20:13:23,227 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:13:33,372 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:13:44,353 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:13:55,983 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:14:08,912 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:14:18,517 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:14:30,677 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:14:39,664 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:14:49,532 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:14:58,654 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:15:09,658 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:15:19,794 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:15:30,679 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:15:40,110 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:15:50,383 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:16:01,217 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:16:12,421 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:16:24,669 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:16:33,725 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:16:45,018 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:16:53,375 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:17:02,910 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:17:11,511 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:17:22,014 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:17:34,163 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:17:45,907 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:17:57,929 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:18:09,422 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:18:20,015 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:18:29,918 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:18:40,752 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:18:51,520 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:19:02,655 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:19:10,867 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:19:15,806 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:19:25,215 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:19:35,778 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:19:43,744 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:19:56,271 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:20:05,869 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:20:17,763 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:20:27,121 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:20:36,274 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:20:48,757 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:20:57,344 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:21:05,359 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:21:17,767 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:21:26,826 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:21:36,967 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:21:47,436 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:21:57,006 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:22:08,286 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:22:17,031 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:22:27,439 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:22:36,936 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:22:47,100 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:22:59,350 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:23:10,192 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:23:19,538 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:23:27,247 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 516, in message_handler
+    await self._book(msg, pair, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 317, in _book
+    await self._snapshot(exchange_pair)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 289, in _snapshot
+    await self.book_callback(L2_BOOK, self._l2_book[std_pair], time.time(), timestamp=timestamp, raw=resp, sequence_number=self.last_update_id[std_pair])
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 247, in book_callback
+    await self.callback(book_type, book, receipt_timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: book_callback() takes 1 positional argument but 2 were given
+2025-07-16 20:23:35,531 : ERROR : BINANCE.ws.1: encountered an exception, reconnecting in 1.0 seconds
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 65, in _create_connection
+    await self._handler(connection, self.handler)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/connection_handler.py", line 99, in _handler
+    await handler(message, connection, self.conn.last_message)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 518, in message_handler
+    await self._trade(msg, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/exchanges/binance.py", line 195, in _trade
+    await self.callback(TRADES, t, timestamp)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/cryptofeed/feed.py", line 258, in callback
+    await cb(obj, receipt_timestamp)
+          ~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: trade_callback() takes 1 positional argument but 2 were given
