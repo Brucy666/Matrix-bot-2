@@ -1,10 +1,9 @@
 # btc_sniper_engine.py
-# Sniper strategy logic for BTC/USDT using KuCoin data and upgraded V-Split Curve Engine
+# Sniper strategy logic for BTC/USDT using KuCoin data
 
 from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
-from sniper_score import score_vsplit_vwap
+from rsi_vsplit_engine import detect_rsi_vsplit
 from spoof_score_engine import apply_binance_spoof_scoring
-from vsplit_curve_engine import scan_vsplit_across_timeframes
 from trap_journal import log_sniper_event
 from discord_alert import send_discord_alert
 from datetime import datetime
@@ -30,19 +29,7 @@ def run_btc_sniper():
         bids = float(orderbook.get("bids", 1.0))
         asks = float(orderbook.get("asks", 1.0))
 
-        score, reasons = score_vsplit_vwap({
-            "rsi": rsi_series,
-            "price": last_close,
-            "vwap": vwap,
-            "bids": bids,
-            "asks": asks
-        })
-
-        # Run advanced RSI-V Curve Scan
-        macro_vsplits = scan_vsplit_across_timeframes(symbol="BTCUSDT")
-        macro_biases = [v["bias"] for v in macro_vsplits if v["confidence"] >= 5]
-        macro_summary = [f"{v['timeframe']}: {v['bias']} ({v['confidence']})" for v in macro_vsplits]
-        macro_confidence = sum(v["confidence"] for v in macro_vsplits if v["bias"] != "Neutral")
+        vsplit_score, vsplit_reason = detect_rsi_vsplit(rsi_series)
 
         trap = {
             "symbol": "BTC/USDT",
@@ -51,16 +38,14 @@ def run_btc_sniper():
             "entry_price": last_close,
             "vwap": round(vwap, 2),
             "rsi": round(rsi_series[-1], 2),
-            "score": score,
-            "reasons": reasons,
-            "trap_type": "RSI-V + VWAP Trap",
+            "score": vsplit_score,
+            "reasons": [vsplit_reason] if vsplit_reason else ["No V-Split"],
+            "trap_type": "RSI-V Split + VWAP Trap",
             "spoof_ratio": round(bids / asks, 2) if asks else 0,
             "bias": "Below" if last_close < vwap else "Above",
-            "confidence": round(score + macro_confidence / 5, 1),
-            "rsi_status": "V-Split" if score >= 2 else "None",
-            "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
-            "macro_vsplit": macro_summary,
-            "macro_biases": macro_biases
+            "confidence": round(vsplit_score, 1),
+            "rsi_status": vsplit_reason if vsplit_score >= 2 else "None",
+            "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range"
         }
 
         trap = apply_binance_spoof_scoring(trap)
