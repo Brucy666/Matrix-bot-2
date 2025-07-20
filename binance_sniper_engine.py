@@ -1,61 +1,76 @@
-# binance_sniper_engine.py
-# Binance sniper engine for global spoof/trap signal detection
+# btc_sniper_engine.py
+# Sniper strategy logic for BTC/USDT using KuCoin data
 
-from binance_feed import analyze_binance_spoof
+from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
 from sniper_score import score_vsplit_vwap
+from spoof_score_engine import apply_binance_spoof_scoring
+from macro_vsplit_engine import run_macro_vsplit_scan
 from trap_journal import log_sniper_event
 from discord_alert import send_discord_alert
 from datetime import datetime
 import numpy as np
 
-print("[✓] Binance Sniper Engine Started for BTC-USDT...")
+print("[✓] BTC Sniper Engine Started for BTC-USDT...")
 
-def run_binance_sniper():
+def run_btc_sniper():
+    df = get_kucoin_sniper_feed()
+    if df is None or len(df) < 20:
+        print("[BTC SNIPER] No data returned from KuCoin feed.")
+        return
+
     try:
-        # Pull spoof + wall info
-        spoof_data = analyze_binance_spoof("BTCUSDT")
-        spoof_ratio = spoof_data.get("spoof_ratio", 0.0)
-        bid_wall = spoof_data.get("bid_wall", 0.0)
-        ask_wall = spoof_data.get("ask_wall", 0.0)
+        close_prices = df['close'].astype(float).tolist()
+        rsi_series = df['rsi'].astype(float).tolist()
+        volume = df['volume'].astype(float).tolist()
 
-        # Placeholder RSI/VWAP estimation for now (until full feed wired)
-        rsi_series = [44.0, 38.5, 41.2]  # mock RSI
-        close_price = 58250.0           # placeholder
-        vwap = 58320.0                  # placeholder
+        last_close = float(close_prices[-1])
+        vwap = float(df['vwap'].iloc[-1]) if 'vwap' in df.columns else np.mean(close_prices)
+
+        orderbook = fetch_orderbook()
+        bids = float(orderbook.get("bids", 1.0))
+        asks = float(orderbook.get("asks", 1.0))
 
         score, reasons = score_vsplit_vwap({
             "rsi": rsi_series,
-            "price": close_price,
+            "price": last_close,
             "vwap": vwap,
-            "bids": bid_wall,
-            "asks": ask_wall
+            "bids": bids,
+            "asks": asks
         })
+
+        macro_data = run_macro_vsplit_scan()
+        macro_biases = [e["bias"] for e in macro_data] if macro_data else []
+        macro_summary = [f"{e['timeframe']}: {e['type']}" for e in macro_data] if macro_data else []
+        macro_confidence = len(macro_data)
 
         trap = {
             "symbol": "BTC/USDT",
-            "exchange": "Binance",
+            "exchange": "KuCoin",
             "timestamp": datetime.utcnow().isoformat(),
-            "entry_price": close_price,
+            "entry_price": last_close,
             "vwap": round(vwap, 2),
             "rsi": round(rsi_series[-1], 2),
             "score": score,
             "reasons": reasons,
-            "trap_type": "Global Spoof Signal",
-            "spoof_ratio": spoof_ratio,
-            "binance_bid_wall": bid_wall,
-            "binance_ask_wall": ask_wall,
-            "bias": "Below" if close_price < vwap else "Above",
-            "confidence": round(score * 1.5, 1),
+            "trap_type": "RSI-V + VWAP Trap",
+            "spoof_ratio": round(bids / asks, 2) if asks else 0,
+            "bias": "Below" if last_close < vwap else "Above",
+            "confidence": round(score + macro_confidence, 1),
             "rsi_status": "V-Split" if score >= 2 else "None",
-            "vsplit_score": "VWAP Zone" if abs(close_price - vwap) / vwap < 0.002 else "Outside Range"
+            "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
+            "macro_vsplit": macro_summary,
+            "macro_biases": macro_biases
         }
 
-        if trap["score"] >= 3:
-            log_sniper_event(trap)
-            send_discord_alert(trap)
-            print("[TRIGGER] Binance Global Sniper Entry:", trap)
+        trap = apply_binance_spoof_scoring(trap)
+
+        log_sniper_event(trap)
+        send_discord_alert(trap)
+
+        if trap["score"] >= 2:
+            print("[TRIGGER] KuCoin Sniper Entry:", trap)
         else:
-            print(f"[BINANCE SNIPER] No trap. Score: {trap['score']}, RSI: {rsi_series[-1]}, Price: {close_price}")
+            print(f"[BTC SNIPER] No trap. Score: {trap['score']}, RSI: {rsi_series[-1]}, Price: {last_close}")
 
     except Exception as e:
-        print(f"[!] Binance Sniper Error: {e}")
+        print(f"[!] BTC Sniper Error: {e}")
