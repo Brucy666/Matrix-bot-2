@@ -9,28 +9,26 @@ from discord_alert import send_discord_alert
 from datetime import datetime
 import numpy as np
 
-print("[✓] BTC Sniper Engine Loaded for KuCoin BTC/USDT")
+print("[✓] BTC Sniper Engine Started for BTC-USDT...")
 
 def run_btc_sniper():
     df = get_kucoin_sniper_feed()
     if df is None or len(df) < 20:
-        print("[BTC SNIPER] ⚠️ No data returned from KuCoin feed.")
+        print("[BTC SNIPER] No data returned from KuCoin feed.")
         return
 
     try:
-        # Price + RSI prep
-        close_prices = df["close"].astype(float).tolist()
-        rsi_series = df["rsi"].astype(float).tolist()
-        last_close = close_prices[-1]
-        vwap = df["vwap"].iloc[-1] if "vwap" in df.columns else np.mean(close_prices)
+        close_prices = df['close'].astype(float).tolist()
+        rsi_series = df['rsi'].astype(float).tolist()
+        volume = df['volume'].astype(float).tolist()
 
-        # Orderbook spoof ratio
+        last_close = float(close_prices[-1])
+        vwap = float(df['vwap'].iloc[-1]) if 'vwap' in df.columns else np.mean(close_prices)
+
         orderbook = fetch_orderbook()
         bids = float(orderbook.get("bids", 1.0))
         asks = float(orderbook.get("asks", 1.0))
-        spoof_ratio = round(bids / asks, 2) if asks else 0
 
-        # RSI/VWAP score
         score, reasons = score_vsplit_vwap({
             "rsi": rsi_series,
             "price": last_close,
@@ -39,7 +37,6 @@ def run_btc_sniper():
             "asks": asks
         })
 
-        # Trap snapshot
         trap = {
             "symbol": "BTC/USDT",
             "exchange": "KuCoin",
@@ -50,25 +47,23 @@ def run_btc_sniper():
             "score": score,
             "reasons": reasons,
             "trap_type": "RSI-V + VWAP Trap",
-            "spoof_ratio": spoof_ratio,
+            "spoof_ratio": round(bids / asks, 2) if asks else 0,
             "bias": "Below" if last_close < vwap else "Above",
             "confidence": round(score, 1),
             "rsi_status": "V-Split" if score >= 2 else "None",
             "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range"
         }
 
-        # Apply spoof scoring upgrade (if any logic exists)
+        # Inject Binance spoof score
         trap = apply_binance_spoof_scoring(trap)
 
-        # Log + Alert
         log_sniper_event(trap)
         send_discord_alert(trap)
 
-        # Terminal log
         if trap["score"] >= 2:
-            print("[TRIGGER] 🟢 BTC Sniper Entry:", trap)
+            print("[TRIGGER] KuCoin Sniper Entry:", trap)
         else:
-            print(f"[BTC SNIPER] No valid trap | Score: {trap['score']} | RSI: {trap['rsi']} | Price: {trap['entry_price']}")
+            print(f"[BTC SNIPER] No trap. Score: {trap['score']}, RSI: {rsi_series[-1]}, Price: {last_close}")
 
     except Exception as e:
-        print(f"[!] BTC Sniper Engine Error: {e}")
+        print(f"[!] BTC Sniper Error: {e}")
