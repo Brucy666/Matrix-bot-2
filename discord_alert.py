@@ -31,9 +31,15 @@ def format_discord_alert(trade_data):
     }.get(rsi_status, "📊")
     v_emoji = "🔵" if "vwap" in str(vsetup).lower() else "🟣" if "split" in str(vsetup).lower() else "❌"
 
-    # Format macro summary
-    macro_v_lines = [f"• {entry}" for entry in macro_summary] if macro_summary else ["None"]
+    # Format macro summary lines
+    macro_v_lines = []
+    if macro_summary:
+        for entry in macro_summary:
+            macro_v_lines.append(f"• {entry}")
+    else:
+        macro_v_lines.append("None")
     macro_v_text = "\n".join(macro_v_lines)
+
     macro_bias_text = macro[0] if macro else "Unclassified"
     macro_bias_emoji = "🔺" if "Bull" in macro_bias_text else "🔻" if "Bear" in macro_bias_text else "➖"
 
@@ -49,7 +55,7 @@ def format_discord_alert(trade_data):
                     {"name": "Bias", "value": f"{emoji} `{bias}`", "inline": True},
                     {"name": "Spoof Ratio", "value": f"{spoof_emoji} `{spoof:.3f}`", "inline": True},
                     {"name": "Trap Type", "value": f"`{trap_type}`", "inline": True},
-                    {"name": "RSI V-Split", "value": f"{rsi_emoji} `{rsi_status}`", "inline": True},
+                    {"name": "RSI Signal", "value": f"{rsi_emoji} `{rsi_status}`", "inline": True},
                     {"name": "VWAP Setup", "value": f"{v_emoji} `{vsetup}`", "inline": True},
                     {"name": "Confidence", "value": f"{confidence_emoji} `{confidence}/10`", "inline": True},
                     {"name": "Macro Bias", "value": f"{macro_bias_emoji} `{macro_bias_text}`", "inline": False},
