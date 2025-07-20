@@ -1,7 +1,7 @@
 # binance_sniper_engine.py
-# Binance BTC/USDT Sniper Engine
+# Sniper strategy logic for BTC/USDT using Binance data
 
-from .binance_feed import get_binance_sniper_feed, fetch_orderbook
+from binance_feed import get_binance_sniper_feed, fetch_orderbook
 from sniper_score import score_vsplit_vwap
 from spoof_score_engine import apply_binance_spoof_scoring
 from trap_journal import log_sniper_event
@@ -54,7 +54,6 @@ def run_binance_sniper():
             "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range"
         }
 
-        # Apply spoof wall scoring
         trap = apply_binance_spoof_scoring(trap)
 
         log_sniper_event(trap)
@@ -66,4 +65,4 @@ def run_binance_sniper():
             print(f"[BINANCE SNIPER] No trap. Score: {trap['score']}, RSI: {rsi_series[-1]}, Price: {last_close}")
 
     except Exception as e:
-        print(f"[!] Binance Sniper Engine Error: {e}")
+        print(f"[!] Binance Sniper Error: {e}")
