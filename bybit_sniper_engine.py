@@ -1,21 +1,21 @@
-# btc_sniper_engine.py
-# Sniper strategy logic for BTC/USDT using KuCoin data with full RSI-V AI engine
+# bybit_sniper_engine.py
+# Sniper strategy logic for BTC/USDT using Bybit data
 
-from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
-from rsi_vsplit_engine import detect_rsi_vsplit
-from multi_tf_vsplit_engine import scan_multi_tf_rsi
+from bybit_feed import get_bybit_sniper_feed
+from kucoin_feed import fetch_orderbook
+from sniper_score import score_vsplit_vwap
 from spoof_score_engine import apply_binance_spoof_scoring
 from trap_journal import log_sniper_event
 from discord_alert import send_discord_alert
 from datetime import datetime
 import numpy as np
 
-print("[✓] BTC Sniper Engine Started for BTC-USDT...")
+print("[✓] Bybit Sniper Engine Started for BTC-USDT...")
 
-def run_btc_sniper():
-    df = get_kucoin_sniper_feed()
+def run_bybit_sniper():
+    df = get_bybit_sniper_feed()
     if df is None or len(df) < 20:
-        print("[BTC SNIPER] No data returned from KuCoin feed.")
+        print("[BYBIT SNIPER] No data received from Bybit.")
         return
 
     try:
@@ -30,53 +30,40 @@ def run_btc_sniper():
         bids = float(orderbook.get("bids", 1.0))
         asks = float(orderbook.get("asks", 1.0))
 
-        # Compute fast and slow RSI
-        fast_rsi = rsi_series
-        slow_rsi = df['rsi'].rolling(8).mean().fillna(50).astype(float).tolist()
+        score, reasons = score_vsplit_vwap({
+            "rsi": rsi_series,
+            "price": last_close,
+            "vwap": vwap,
+            "bids": bids,
+            "asks": asks
+        })
 
-        # Detect primary RSI-V signal
-        vsplit = detect_rsi_vsplit(fast_rsi, slow_rsi)
-
-        # Retrieve macro V-Split summary
-        macro_summary, macro_bias = scan_multi_tf_rsi()
-
-        # Trap payload
         trap = {
             "symbol": "BTC/USDT",
-            "exchange": "KuCoin",
+            "exchange": "Bybit",
             "timestamp": datetime.utcnow().isoformat(),
             "entry_price": last_close,
             "vwap": round(vwap, 2),
             "rsi": round(rsi_series[-1], 2),
-            "score": vsplit["strength"],
-            "reasons": [vsplit["reason"]] if vsplit["reason"] else ["No V-Split"],
-            "trap_type": vsplit["type"] if vsplit["type"] else "VWAP Trap",
+            "score": score,
+            "reasons": reasons,
+            "trap_type": "RSI-V + VWAP Trap",
             "spoof_ratio": round(bids / asks, 2) if asks else 0,
             "bias": "Below" if last_close < vwap else "Above",
-            "confidence": round(vsplit["strength"], 1),
-            "rsi_status": vsplit["type"] if vsplit["type"] else "None",
-            "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
-            "macro_vsplit": [f"{s['timeframe']}: {s['type']} ({s['strength']})" for s in macro_summary],
-            "macro_biases": [macro_bias]
+            "confidence": round(score, 1),
+            "rsi_status": "V-Split" if score >= 2 else "None",
+            "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range"
         }
 
-        # Adjust confidence using macro bias
-        if macro_bias == "Strong Bull":
-            trap["confidence"] += 2
-        elif macro_bias == "Strong Bear":
-            trap["confidence"] -= 1
-
-        # Add spoof scoring
         trap = apply_binance_spoof_scoring(trap)
 
-        # Log and send alert
         log_sniper_event(trap)
         send_discord_alert(trap)
 
         if trap["score"] >= 2:
-            print("[TRIGGER] KuCoin Sniper Entry:", trap)
+            print("[TRIGGER] Bybit Sniper Entry:", trap)
         else:
-            print(f"[BTC SNIPER] No trap. Score: {trap['score']}, RSI: {rsi_series[-1]}, Price: {last_close}")
+            print(f"[BYBIT SNIPER] No trap. Score: {trap['score']}, RSI: {rsi_series[-1]}, Price: {last_close}")
 
     except Exception as e:
-        print(f"[!] BTC Sniper Error: {e}")
+        print(f"[!] Bybit Sniper Error: {e}")
