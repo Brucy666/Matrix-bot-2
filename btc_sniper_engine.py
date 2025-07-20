@@ -1,10 +1,10 @@
 # btc_sniper_engine.py
-# Sniper strategy logic for BTC/USDT using KuCoin data
+# Sniper strategy logic for BTC/USDT using KuCoin data and upgraded V-Split Curve Engine
 
 from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
 from sniper_score import score_vsplit_vwap
 from spoof_score_engine import apply_binance_spoof_scoring
-from macro_vsplit_engine import run_macro_vsplit_scan
+from vsplit_curve_engine import scan_vsplit_across_timeframes
 from trap_journal import log_sniper_event
 from discord_alert import send_discord_alert
 from datetime import datetime
@@ -38,10 +38,11 @@ def run_btc_sniper():
             "asks": asks
         })
 
-        macro_data = run_macro_vsplit_scan()
-        macro_biases = [e["bias"] for e in macro_data] if macro_data else []
-        macro_summary = [f"{e['timeframe']}: {e['type']}" for e in macro_data] if macro_data else []
-        macro_confidence = len(macro_data)
+        # Run advanced RSI-V Curve Scan
+        macro_vsplits = scan_vsplit_across_timeframes(symbol="BTCUSDT")
+        macro_biases = [v["bias"] for v in macro_vsplits if v["confidence"] >= 5]
+        macro_summary = [f"{v['timeframe']}: {v['bias']} ({v['confidence']})" for v in macro_vsplits]
+        macro_confidence = sum(v["confidence"] for v in macro_vsplits if v["bias"] != "Neutral")
 
         trap = {
             "symbol": "BTC/USDT",
@@ -55,7 +56,7 @@ def run_btc_sniper():
             "trap_type": "RSI-V + VWAP Trap",
             "spoof_ratio": round(bids / asks, 2) if asks else 0,
             "bias": "Below" if last_close < vwap else "Above",
-            "confidence": round(score + macro_confidence, 1),
+            "confidence": round(score + macro_confidence / 5, 1),
             "rsi_status": "V-Split" if score >= 2 else "None",
             "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
             "macro_vsplit": macro_summary,
