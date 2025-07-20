@@ -31,6 +31,12 @@ def format_discord_alert(trade_data):
     }.get(rsi_status, "📊")
     v_emoji = "🔵" if "vwap" in str(vsetup).lower() else "🟣" if "split" in str(vsetup).lower() else "❌"
 
+    # Format macro summary
+    macro_v_lines = [f"• {entry}" for entry in macro_summary] if macro_summary else ["None"]
+    macro_v_text = "\n".join(macro_v_lines)
+    macro_bias_text = macro[0] if macro else "Unclassified"
+    macro_bias_emoji = "🔺" if "Bull" in macro_bias_text else "🔻" if "Bear" in macro_bias_text else "➖"
+
     return {
         "username": "QuickStrike Bot",
         "embeds": [
@@ -46,8 +52,8 @@ def format_discord_alert(trade_data):
                     {"name": "RSI V-Split", "value": f"{rsi_emoji} `{rsi_status}`", "inline": True},
                     {"name": "VWAP Setup", "value": f"{v_emoji} `{vsetup}`", "inline": True},
                     {"name": "Confidence", "value": f"{confidence_emoji} `{confidence}/10`", "inline": True},
-                    {"name": "Macro Biases", "value": f"`{', '.join(macro) if macro else 'None'}`", "inline": False},
-                    {"name": "Macro V-Splits", "value": f"`{', '.join(macro_summary) if macro_summary else 'N/A'}`", "inline": False},
+                    {"name": "Macro Bias", "value": f"{macro_bias_emoji} `{macro_bias_text}`", "inline": False},
+                    {"name": "Macro V-Splits", "value": f"```\n{macro_v_text}```", "inline": False},
                     {"name": "Timestamp", "value": f"`{timestamp}`", "inline": False}
                 ],
                 "footer": {"text": "QuickStrike Sniper Feed"}
