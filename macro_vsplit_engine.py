@@ -1,73 +1,68 @@
 # macro_vsplit_engine.py
-# Detects macro V-Split RSI zones on KuCoin using 4H, 8H, and 1D data
+# Multi-Timeframe RSI-V Macro Split Engine
 
-import requests
 import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
+from kucoin_feed import get_kucoin_sniper_feed
 
-KUCOIN_API = "https://api.kucoin.com"
+# Timeframe config and color bias
+TIMEFRAMES = {
+    "1D": {"interval": "1d", "bias": "macro"},
+    "8H": {"interval": "8h", "bias": "trend"},
+    "4H": {"interval": "4h", "bias": "momentum"},
+    "1H": {"interval": "1h", "bias": "setup"},
+    "30M": {"interval": "30m", "bias": "entry"},
+}
 
-
-def fetch_kucoin_ohlcv(symbol="BTC-USDT", interval="4hour", limit=100):
+# Utility to fetch and calculate RSI-V per timeframe
+def detect_rsi_vsplit(df, label=""):
     try:
-        url = f"{KUCOIN_API}/api/v1/market/candles"
-        params = {"type": interval, "symbol": symbol.replace("/", "-"), "limit": limit}
-        res = requests.get(url, params=params, timeout=10)
-        data = res.json().get("data", [])
-        df = pd.DataFrame(data, columns=["timestamp", "open", "close", "high", "low", "volume", "turnover"])
-        df = df.astype(float)
-        df = df.iloc[::-1]  # reverse chronological
-        df["vwap"] = df["turnover"] / df["volume"]
-        delta = df["close"].diff()
-        gain = delta.clip(lower=0).rolling(window=14).mean()
-        loss = -delta.clip(upper=0).rolling(window=14).mean()
-        rs = gain / loss
-        df["rsi"] = 100 - (100 / (1 + rs))
-        return df
-    except Exception as e:
-        print(f"[MACRO VSPLIT] Feed error ({interval}):", e)
+        if df is None or len(df) < 20:
+            return None
+        rsi = df['rsi'].astype(float).tolist()
+        price = df['close'].astype(float).tolist()
+
+        if rsi[-1] > rsi[-2] and price[-1] < price[-2]:
+            return "RSI V-Split (Bullish)"
+        elif rsi[-1] < rsi[-2] and price[-1] > price[-2]:
+            return "RSI V-Split (Bearish)"
+        return None
+    except:
         return None
 
+# Run full macro sweep
+def run_macro_vsplit_scan():
+    print("\n[MACRO 🧠] Starting RSI-V Macro Split Scan...\n")
 
-def detect_macro_vsplit(df):
-    if df is None or len(df) < 20:
-        return None
+    active_splits = []
 
-    try:
-        recent_rsi = df["rsi"].iloc[-5:].values
-        rsi_now = recent_rsi[-1]
-        rsi_avg = np.mean(recent_rsi[:-1])
-        
-        vsplit_score = round(rsi_now - rsi_avg, 2)
+    for tf, config in TIMEFRAMES.items():
+        interval = config["interval"]
+        bias_type = config["bias"]
 
-        if vsplit_score > 8:
-            return {"status": "Expansion Top", "score": vsplit_score}
-        elif vsplit_score < -8:
-            return {"status": "Expansion Bottom", "score": vsplit_score}
-        elif abs(vsplit_score) > 3:
-            return {"status": "Compression Zone", "score": vsplit_score}
-        else:
-            return {"status": "Flat", "score": vsplit_score}
+        print(f"[CHECK] Fetching {tf} RSI-V data...")
 
-    except Exception as e:
-        print("[MACRO VSPLIT] Detection error:", e)
-        return None
+        df = get_kucoin_sniper_feed(symbol="BTCUSDT", interval=interval)
+        vsplit_result = detect_rsi_vsplit(df)
 
+        if vsplit_result:
+            active_splits.append({
+                "timeframe": tf,
+                "bias": bias_type,
+                "type": vsplit_result,
+                "rsi": round(df['rsi'].iloc[-1], 2),
+                "price": round(df['close'].iloc[-1], 2)
+            })
 
-def get_macro_vsplit_summary():
-    timeframes = ["4hour", "8hour", "1day"]
-    summary = {}
+    if not active_splits:
+        print("[MACRO 🧠] No V-Split signals detected on any major timeframe.\n")
+    else:
+        print("\n[MACRO ✅] Active RSI-V Splits Detected:")
+        for entry in active_splits:
+            print(f"→ {entry['timeframe']} ({entry['bias']}): {entry['type']} | RSI: {entry['rsi']} | Price: {entry['price']}")
 
-    for tf in timeframes:
-        df = fetch_kucoin_ohlcv(interval=tf)
-        result = detect_macro_vsplit(df)
-        if result:
-            summary[tf] = result
+    return active_splits
 
-    return summary
-
-
+# Entry point for testing manually
 if __name__ == "__main__":
-    print("[TEST] Macro VSplit Summary:")
-    print(get_macro_vsplit_summary())
+    run_macro_vsplit_scan()
