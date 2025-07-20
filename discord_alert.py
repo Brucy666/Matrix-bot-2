@@ -8,26 +8,28 @@ def format_discord_alert(trade_data):
     symbol = trade_data.get("symbol", "N/A")
     exchange = trade_data.get("exchange", "Unknown")
     score = trade_data.get("score", 0)
-    confidence = trade_data.get("confidence", 0)
     spoof = trade_data.get("spoof_ratio", 0)
-    trap_type = trade_data.get("trap_type", "Unclassified")
     bias = trade_data.get("bias", "Unknown").capitalize()
+    trap_type = trade_data.get("trap_type", "Unclassified")
     rsi_status = trade_data.get("rsi_status", "None")
+    confidence = trade_data.get("confidence", 0)
     vsetup = trade_data.get("vsplit_score", "None")
+    macro = trade_data.get("macro_biases", [])
+    macro_summary = trade_data.get("macro_vsplit", [])
     timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
 
-    # Optional extras
-    macro_summary = trade_data.get("macro_vsplit", [])
-    macro_biases = trade_data.get("macro_biases", [])
-    v_summary = "\n".join(macro_summary) if macro_summary else "N/A"
-    bias_summary = ", ".join(macro_biases) if macro_biases else "None"
-
-    # 🎯 Emojis
+    # Emojis
     emoji = "📉" if bias == "Below" else "📈"
     spoof_emoji = "🟢" if spoof < 0.3 else "🟠" if spoof < 0.6 else "🔴"
-    rsi_emoji = "💥" if "split" in rsi_status.lower() else "📊"
-    vwap_emoji = "🟣" if "vwap" in vsetup.lower() else "🟡" if "split" in vsetup.lower() else "⚪"
-    confidence_emoji = "✅" if confidence >= 8 else "⚠️" if confidence >= 5 else "💤"
+    confidence_emoji = "🧠" if confidence >= 8 else "⚠️" if confidence >= 5 else "💤"
+    rsi_emoji = {
+        "RSI V-Split": "💥",
+        "RSI Collapse": "🔥",
+        "RSI Compression": "📡",
+        "RSI Sync Up": "⬆️",
+        "RSI Sync Down": "⬇️"
+    }.get(rsi_status, "📊")
+    v_emoji = "🔵" if "vwap" in str(vsetup).lower() else "🟣" if "split" in str(vsetup).lower() else "❌"
 
     return {
         "username": "QuickStrike Bot",
@@ -42,10 +44,10 @@ def format_discord_alert(trade_data):
                     {"name": "Spoof Ratio", "value": f"{spoof_emoji} `{spoof:.3f}`", "inline": True},
                     {"name": "Trap Type", "value": f"`{trap_type}`", "inline": True},
                     {"name": "RSI V-Split", "value": f"{rsi_emoji} `{rsi_status}`", "inline": True},
-                    {"name": "VWAP Setup", "value": f"{vwap_emoji} `{vsetup}`", "inline": True},
+                    {"name": "VWAP Setup", "value": f"{v_emoji} `{vsetup}`", "inline": True},
                     {"name": "Confidence", "value": f"{confidence_emoji} `{confidence}/10`", "inline": True},
-                    {"name": "Macro Biases", "value": f"`{bias_summary}`", "inline": False},
-                    {"name": "Macro V-Splits", "value": f"```{v_summary}```", "inline": False},
+                    {"name": "Macro Biases", "value": f"`{', '.join(macro) if macro else 'None'}`", "inline": False},
+                    {"name": "Macro V-Splits", "value": f"`{', '.join(macro_summary) if macro_summary else 'N/A'}`", "inline": False},
                     {"name": "Timestamp", "value": f"`{timestamp}`", "inline": False}
                 ],
                 "footer": {"text": "QuickStrike Sniper Feed"}
