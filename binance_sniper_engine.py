@@ -1,21 +1,20 @@
-# btc_sniper_engine.py
-# Sniper strategy logic for BTC/USDT using KuCoin data
+# binance_sniper_engine.py
+# Binance BTC/USDT Sniper Engine
 
-from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
+from binance_feed import get_binance_sniper_feed, fetch_orderbook
 from sniper_score import score_vsplit_vwap
 from spoof_score_engine import apply_binance_spoof_scoring
-from macro_vsplit_engine import run_macro_vsplit_scan
 from trap_journal import log_sniper_event
 from discord_alert import send_discord_alert
 from datetime import datetime
 import numpy as np
 
-print("[✓] BTC Sniper Engine Started for BTC-USDT...")
+print("[✓] Binance Sniper Engine Started for BTC-USDT...")
 
-def run_btc_sniper():
-    df = get_kucoin_sniper_feed()
+def run_binance_sniper():
+    df = get_binance_sniper_feed()
     if df is None or len(df) < 20:
-        print("[BTC SNIPER] No data returned from KuCoin feed.")
+        print("[BINANCE SNIPER] No data returned from Binance feed.")
         return
 
     try:
@@ -38,14 +37,9 @@ def run_btc_sniper():
             "asks": asks
         })
 
-        macro_data = run_macro_vsplit_scan()
-        macro_biases = [e["bias"] for e in macro_data] if macro_data else []
-        macro_summary = [f"{e['timeframe']}: {e['type']}" for e in macro_data] if macro_data else []
-        macro_confidence = len(macro_data)
-
         trap = {
             "symbol": "BTC/USDT",
-            "exchange": "KuCoin",
+            "exchange": "Binance",
             "timestamp": datetime.utcnow().isoformat(),
             "entry_price": last_close,
             "vwap": round(vwap, 2),
@@ -55,22 +49,21 @@ def run_btc_sniper():
             "trap_type": "RSI-V + VWAP Trap",
             "spoof_ratio": round(bids / asks, 2) if asks else 0,
             "bias": "Below" if last_close < vwap else "Above",
-            "confidence": round(score + macro_confidence, 1),
+            "confidence": round(score, 1),
             "rsi_status": "V-Split" if score >= 2 else "None",
-            "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
-            "macro_vsplit": macro_summary,
-            "macro_biases": macro_biases
+            "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range"
         }
 
+        # Apply spoof wall scoring
         trap = apply_binance_spoof_scoring(trap)
 
         log_sniper_event(trap)
         send_discord_alert(trap)
 
         if trap["score"] >= 2:
-            print("[TRIGGER] KuCoin Sniper Entry:", trap)
+            print("[TRIGGER] Binance Sniper Entry:", trap)
         else:
-            print(f"[BTC SNIPER] No trap. Score: {trap['score']}, RSI: {rsi_series[-1]}, Price: {last_close}")
+            print(f"[BINANCE SNIPER] No trap. Score: {trap['score']}, RSI: {rsi_series[-1]}, Price: {last_close}")
 
     except Exception as e:
-        print(f"[!] BTC Sniper Error: {e}")
+        print(f"[!] Binance Sniper Engine Error: {e}")
