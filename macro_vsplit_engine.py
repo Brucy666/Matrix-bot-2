@@ -1,68 +1,67 @@
 # macro_vsplit_engine.py
-# Multi-Timeframe RSI-V Macro Split Engine
+# Multi-Timeframe RSI V-Split Detector for BTC/USDT
 
-import pandas as pd
 from datetime import datetime
-from kucoin_feed import get_kucoin_sniper_feed
+import numpy as np
+import random
 
-# Timeframe config and color bias
-TIMEFRAMES = {
-    "1D": {"interval": "1d", "bias": "macro"},
-    "8H": {"interval": "8h", "bias": "trend"},
-    "4H": {"interval": "4h", "bias": "momentum"},
-    "1H": {"interval": "1h", "bias": "setup"},
-    "30M": {"interval": "30m", "bias": "entry"},
+# ------------------------------------------
+# 🔧 Mock OHLCV Data Generator (Replaceable)
+# ------------------------------------------
+def generate_mock_ohlcv(length=100):
+    prices = np.cumsum(np.random.randn(length) * 20 + 100)
+    volumes = np.random.rand(length) * 1000
+    return {
+        "close": prices,
+        "volume": volumes,
+        "timestamp": [datetime.utcnow().isoformat()] * length
+    }
+
+# -----------------------------
+# 📈 RSI Calculator (14-period)
+# -----------------------------
+def calculate_rsi(prices, period=14):
+    delta = np.diff(prices)
+    gain = np.maximum(delta, 0)
+    loss = -np.minimum(delta, 0)
+    avg_gain = np.convolve(gain, np.ones(period), 'valid') / period
+    avg_loss = np.convolve(loss, np.ones(period), 'valid') / period
+    rs = avg_gain / (avg_loss + 1e-6)
+    rsi = 100 - (100 / (1 + rs))
+    return np.concatenate((np.full(period - 1, 50), rsi))
+
+# ----------------------------------------
+# 🔍 V-Split Detection on RSI Trend Slope
+# ----------------------------------------
+def detect_rsi_vsplit(rsi_series):
+    if len(rsi_series) < 10:
+        return False, rsi_series[-1], rsi_series[-2]
+
+    recent = rsi_series[-5:]
+    slope = np.polyfit(range(len(recent)), recent, 1)[0]
+    return slope > 1.5, rsi_series[-1], rsi_series[-2]
+
+# -----------------------------
+# 🧠 Main Macro Detection Engine
+# -----------------------------
+print("\n[🔍 Macro V-Split Engine Starting...]")
+
+# Simulated timeframes and labels
+timeframes = {
+    "1m": generate_mock_ohlcv(),
+    "5m": generate_mock_ohlcv(),
+    "15m": generate_mock_ohlcv(),
+    "1h": generate_mock_ohlcv(),
+    "4h": generate_mock_ohlcv(),
+    "1D": generate_mock_ohlcv()
 }
 
-# Utility to fetch and calculate RSI-V per timeframe
-def detect_rsi_vsplit(df, label=""):
-    try:
-        if df is None or len(df) < 20:
-            return None
-        rsi = df['rsi'].astype(float).tolist()
-        price = df['close'].astype(float).tolist()
-
-        if rsi[-1] > rsi[-2] and price[-1] < price[-2]:
-            return "RSI V-Split (Bullish)"
-        elif rsi[-1] < rsi[-2] and price[-1] > price[-2]:
-            return "RSI V-Split (Bearish)"
-        return None
-    except:
-        return None
-
-# Run full macro sweep
-def run_macro_vsplit_scan():
-    print("\n[MACRO 🧠] Starting RSI-V Macro Split Scan...\n")
-
-    active_splits = []
-
-    for tf, config in TIMEFRAMES.items():
-        interval = config["interval"]
-        bias_type = config["bias"]
-
-        print(f"[CHECK] Fetching {tf} RSI-V data...")
-
-        df = get_kucoin_sniper_feed(symbol="BTCUSDT", interval=interval)
-        vsplit_result = detect_rsi_vsplit(df)
-
-        if vsplit_result:
-            active_splits.append({
-                "timeframe": tf,
-                "bias": bias_type,
-                "type": vsplit_result,
-                "rsi": round(df['rsi'].iloc[-1], 2),
-                "price": round(df['close'].iloc[-1], 2)
-            })
-
-    if not active_splits:
-        print("[MACRO 🧠] No V-Split signals detected on any major timeframe.\n")
+for tf, data in timeframes.items():
+    rsi = calculate_rsi(data["close"])
+    signal, current, previous = detect_rsi_vsplit(rsi)
+    if signal:
+        print(f"[✓] {tf} RSI V-Split Detected ➜ RSI: {round(previous,1)} ➔ {round(current,1)}")
     else:
-        print("\n[MACRO ✅] Active RSI-V Splits Detected:")
-        for entry in active_splits:
-            print(f"→ {entry['timeframe']} ({entry['bias']}): {entry['type']} | RSI: {entry['rsi']} | Price: {entry['price']}")
+        print(f"[ ] {tf} No V-Split ➜ RSI: {round(current,1)}")
 
-    return active_splits
-
-# Entry point for testing manually
-if __name__ == "__main__":
-    run_macro_vsplit_scan()
+print("[✓] Macro V-Split Engine Complete\n")
