@@ -1,58 +1,73 @@
 # macro_vsplit_engine.py
+# Detects macro V-Split RSI zones on KuCoin using 4H, 8H, and 1D data
 
+import requests
 import pandas as pd
 import numpy as np
+from datetime import datetime, timedelta
 
-def calculate_rsi(close, period=14):
-    delta = close.diff()
-    gain = delta.clip(lower=0).rolling(period).mean()
-    loss = -delta.clip(upper=0).rolling(period).mean()
-    rs = gain / loss
-    return 100 - (100 / (1 + rs))
+KUCOIN_API = "https://api.kucoin.com"
 
-def detect_vsplit(rsi_series):
-    if len(rsi_series) < 3:
-        return False, 0.0
 
-    rsi1, rsi2, rsi3 = rsi_series[-3], rsi_series[-2], rsi_series[-1]
+def fetch_kucoin_ohlcv(symbol="BTC-USDT", interval="4hour", limit=100):
+    try:
+        url = f"{KUCOIN_API}/api/v1/market/candles"
+        params = {"type": interval, "symbol": symbol.replace("/", "-"), "limit": limit}
+        res = requests.get(url, params=params, timeout=10)
+        data = res.json().get("data", [])
+        df = pd.DataFrame(data, columns=["timestamp", "open", "close", "high", "low", "volume", "turnover"])
+        df = df.astype(float)
+        df = df.iloc[::-1]  # reverse chronological
+        df["vwap"] = df["turnover"] / df["volume"]
+        delta = df["close"].diff()
+        gain = delta.clip(lower=0).rolling(window=14).mean()
+        loss = -delta.clip(upper=0).rolling(window=14).mean()
+        rs = gain / loss
+        df["rsi"] = 100 - (100 / (1 + rs))
+        return df
+    except Exception as e:
+        print(f"[MACRO VSPLIT] Feed error ({interval}):", e)
+        return None
 
-    if rsi1 > rsi2 < rsi3 and rsi3 > 30:
-        split_strength = abs(rsi1 - rsi2) + abs(rsi3 - rsi2)
-        return True, round(split_strength / 2, 2)
-    
-    return False, 0.0
 
-def macro_vsplit_engine(rsi_dict):
-    """
-    Input:
-    {
-        "12h": pd.Series,
-        "4h": pd.Series,
-        "2h": pd.Series,
-        "1h": pd.Series
-    }
-    Output:
-    {
-        "macro_vsplit": {
-            "12h": {"vsplit": True, "strength": 3.2},
-            ...
-            "score": 7.9,
-            "bias": "bearish"
-        }
-    }
-    """
-    macro_result = {}
-    total_score = 0.0
-    trigger_count = 0
+def detect_macro_vsplit(df):
+    if df is None or len(df) < 20:
+        return None
 
-    for tf, rsi_series in rsi_dict.items():
-        vsplit, strength = detect_vsplit(rsi_series)
-        macro_result[tf] = {"vsplit": vsplit, "strength": strength if vsplit else 0.0}
-        if vsplit:
-            total_score += strength
-            trigger_count += 1
+    try:
+        recent_rsi = df["rsi"].iloc[-5:].values
+        rsi_now = recent_rsi[-1]
+        rsi_avg = np.mean(recent_rsi[:-1])
+        
+        vsplit_score = round(rsi_now - rsi_avg, 2)
 
-    macro_result["score"] = round(total_score, 2)
-    macro_result["bias"] = "bearish" if trigger_count >= 2 else "neutral"
+        if vsplit_score > 8:
+            return {"status": "Expansion Top", "score": vsplit_score}
+        elif vsplit_score < -8:
+            return {"status": "Expansion Bottom", "score": vsplit_score}
+        elif abs(vsplit_score) > 3:
+            return {"status": "Compression Zone", "score": vsplit_score}
+        else:
+            return {"status": "Flat", "score": vsplit_score}
 
-    return {"macro_vsplit": macro_result}
+    except Exception as e:
+        print("[MACRO VSPLIT] Detection error:", e)
+        return None
+
+
+def get_macro_vsplit_summary():
+    timeframes = ["4hour", "8hour", "1day"]
+    summary = {}
+
+    for tf in timeframes:
+        df = fetch_kucoin_ohlcv(interval=tf)
+        result = detect_macro_vsplit(df)
+        if result:
+            summary[tf] = result
+
+    return summary
+
+
+if __name__ == "__main__":
+    print("[TEST] Macro VSplit Summary:")
+    print(get_macro_vsplit_summary())
