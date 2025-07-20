@@ -1,59 +1,48 @@
 # discord_alert.py
+# Enhanced Discord alert sender with V-Split summary injection
+
 import requests
-from datetime import datetime
+import os
 
-DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395380527938404363/e7RT8fXbH14NuInl0x-Z3uy111KjRZ78JcOkdHLmlnWZiwTfBQedGg43p3FpJ9ZSU3Xg"
+WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
-def format_discord_alert(trade_data):
-    symbol = trade_data.get("symbol", "N/A")
-    exchange = trade_data.get("exchange", "Unknown")
-    score = trade_data.get("score", 0)
-    spoof = trade_data.get("spoof_ratio", 0)
-    bias = trade_data.get("bias", "Unknown").capitalize()
-    trap_type = trade_data.get("trap_type", "Unclassified")
-    rsi_status = trade_data.get("rsi_status", "None")
-    confidence = trade_data.get("confidence", 0)
-    vsetup = trade_data.get("vsplit_score", "None")
-    timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
+# Utility to post alert to Discord with rich embed
+def send_discord_alert(trap):
+    if not WEBHOOK_URL:
+        print("[x] Discord webhook URL not configured.")
+        return
 
-    # Emojis
-    emoji = "📉" if bias == "Below" else "📈"
-    spoof_emoji = "🟢" if spoof < 0.3 else "🟠" if spoof < 0.6 else "🔴"
-    confidence_emoji = "🧠" if confidence >= 8 else "⚠️" if confidence >= 5 else "❓"
-    rsi_emoji = "💥" if "split" in rsi_status.lower() else "🌀" if "collapse" in rsi_status.lower() else "📊"
-    v_emoji = "🔵" if "vwap" in str(vsetup).lower() else "🟣" if "split" in str(vsetup).lower() else "❌"
+    symbol = trap.get("symbol", "?")
+    exchange = trap.get("exchange", "?")
+    price = trap.get("entry_price", "?")
+    rsi = trap.get("rsi", "?")
+    score = trap.get("score", 0)
+    confidence = trap.get("confidence", 0)
+    bias = trap.get("bias", "?")
+    trap_type = trap.get("trap_type", "?")
+    reasons = trap.get("reasons", [])
+    spoof = trap.get("spoof_ratio", 0)
+    rsi_status = trap.get("rsi_status", "None")
+    vsplit_type = trap.get("vsplit_type", "None")
+    vsplit_strength = trap.get("vsplit_strength", 0.0)
+    vsplit_score = trap.get("vsplit_score", "None")
 
-    return {
-        "username": "QuickStrike Bot",
-        "embeds": [
-            {
-                "title": "🎯 Sniper Trade Executed",
-                "color": 0x00ffae if bias == "Above" else 0xff5555,
-                "fields": [
-                    {"name": "Token", "value": f"`{symbol}`", "inline": True},
-                    {"name": "Exchange", "value": f"`{exchange}`", "inline": True},
-                    {"name": "Bias", "value": f"{emoji} `{bias}`", "inline": True},
-                    {"name": "Spoof Ratio", "value": f"{spoof_emoji} `{spoof:.3f}`", "inline": True},
-                    {"name": "Trap Type", "value": f"`{trap_type}`", "inline": True},
-                    {"name": "RSI", "value": f"{rsi_emoji} `{rsi_status}`", "inline": True},
-                    {"name": "VWAP / V Setup", "value": f"{v_emoji} `{vsetup}`", "inline": True},
-                    {"name": "Confidence", "value": f"{confidence_emoji} `{confidence}/10`", "inline": True},
-                    {"name": "Timestamp", "value": f"`{timestamp}`", "inline": False}
-                ],
-                "footer": {"text": "QuickStrike Sniper Feed"}
-            }
-        ]
-    }
+    summary = f"**🔥 Sniper Entry [{symbol}]**\n"
+    summary += f"Exchange: {exchange} | Bias: **{bias}**\n"
+    summary += f"Trap Type: `{trap_type}`\n"
+    summary += f"Score: `{score}` | Confidence: `{confidence}`\n"
+    summary += f"VWAP Score: `{vsplit_score}`\n"
+    summary += f"RSI Status: `{rsi_status}`\n"
+    if vsplit_type != "None":
+        summary += f"V-Split Type: **{vsplit_type}** | Δ: `{vsplit_strength}`\n"
+    summary += f"RSI: `{rsi}` | Price: `{price}`\n"
+    summary += f"Reasons: {', '.join(reasons)}"
 
-def send_discord_alert(trade_data):
-    payload = format_discord_alert(trade_data)
-    headers = {"Content-Type": "application/json"}
+    payload = {"content": summary}
 
     try:
-        res = requests.post(DISCORD_WEBHOOK, json=payload, headers=headers)
-        if res.status_code in [200, 204]:
-            print("[✓] Discord alert sent.")
-        else:
-            print(f"[!] Discord alert failed: {res.status_code}, {res.text}")
+        res = requests.post(WEBHOOK_URL, json=payload, timeout=5)
+        if res.status_code != 204:
+            print(f"[x] Discord webhook error: {res.status_code}")
     except Exception as e:
-        print(f"[!] Discord alert error: {e}")
+        print(f"[x] Discord alert exception: {e}")
