@@ -1,8 +1,9 @@
 # btc_sniper_engine.py
-# Sniper strategy logic for BTC/USDT using KuCoin data
+# Sniper strategy logic for BTC/USDT using KuCoin data with multi-timeframe RSI-V intelligence
 
 from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
 from rsi_vsplit_engine import detect_rsi_vsplit
+from rsi_vsplit_memory import get_multi_rsi_vsplit
 from spoof_score_engine import apply_binance_spoof_scoring
 from trap_journal import log_sniper_event
 from discord_alert import send_discord_alert
@@ -29,12 +30,17 @@ def run_btc_sniper():
         bids = float(orderbook.get("bids", 1.0))
         asks = float(orderbook.get("asks", 1.0))
 
-        # Extract fast and slow RSI (same list in this simple case)
-        fast_rsi = df['rsi'].astype(float).tolist()
+        # Compute fast and slow RSI
+        fast_rsi = rsi_series
         slow_rsi = df['rsi'].rolling(8).mean().fillna(50).astype(float).tolist()
 
+        # Detect primary RSI-V signal
         vsplit = detect_rsi_vsplit(fast_rsi, slow_rsi)
 
+        # Retrieve macro V-Split summary
+        macro_summary, macro_bias = get_multi_rsi_vsplit()
+
+        # Trap payload
         trap = {
             "symbol": "BTC/USDT",
             "exchange": "KuCoin",
@@ -49,11 +55,21 @@ def run_btc_sniper():
             "bias": "Below" if last_close < vwap else "Above",
             "confidence": round(vsplit["strength"], 1),
             "rsi_status": vsplit["type"] if vsplit["type"] else "None",
-            "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range"
+            "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
+            "macro_vsplit": [f"{s['timeframe']}: {s['type']} ({s['strength']})" for s in macro_summary],
+            "macro_biases": [macro_bias]
         }
 
+        # Adjust confidence using macro bias
+        if macro_bias == "Strong Bull":
+            trap["confidence"] += 2
+        elif macro_bias == "Strong Bear":
+            trap["confidence"] -= 1
+
+        # Add spoof scoring
         trap = apply_binance_spoof_scoring(trap)
 
+        # Log and send alert
         log_sniper_event(trap)
         send_discord_alert(trap)
 
