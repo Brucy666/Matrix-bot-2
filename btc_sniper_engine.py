@@ -1,9 +1,9 @@
 # btc_sniper_engine.py
-# Sniper strategy logic for BTC/USDT using KuCoin data with multi-timeframe RSI-V intelligence
+# Sniper strategy logic for BTC/USDT using KuCoin data with full RSI-V AI engine
 
 from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
 from rsi_vsplit_engine import detect_rsi_vsplit
-from rsi_vsplit_memory import get_multi_rsi_vsplit
+from multi_tf_vsplit_engine import scan_multi_tf_rsi
 from spoof_score_engine import apply_binance_spoof_scoring
 from trap_journal import log_sniper_event
 from discord_alert import send_discord_alert
@@ -38,7 +38,7 @@ def run_btc_sniper():
         vsplit = detect_rsi_vsplit(fast_rsi, slow_rsi)
 
         # Retrieve macro V-Split summary
-        macro_summary, macro_bias = get_multi_rsi_vsplit()
+        macro_summary, macro_bias = scan_multi_tf_rsi()
 
         # Trap payload
         trap = {
