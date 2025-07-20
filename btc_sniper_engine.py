@@ -29,7 +29,11 @@ def run_btc_sniper():
         bids = float(orderbook.get("bids", 1.0))
         asks = float(orderbook.get("asks", 1.0))
 
-        vsplit_score, vsplit_reason = detect_rsi_vsplit(rsi_series)
+        # Extract fast and slow RSI (same list in this simple case)
+        fast_rsi = df['rsi'].astype(float).tolist()
+        slow_rsi = df['rsi'].rolling(8).mean().fillna(50).astype(float).tolist()
+
+        vsplit = detect_rsi_vsplit(fast_rsi, slow_rsi)
 
         trap = {
             "symbol": "BTC/USDT",
@@ -38,13 +42,13 @@ def run_btc_sniper():
             "entry_price": last_close,
             "vwap": round(vwap, 2),
             "rsi": round(rsi_series[-1], 2),
-            "score": vsplit_score,
-            "reasons": [vsplit_reason] if vsplit_reason else ["No V-Split"],
-            "trap_type": "RSI-V Split + VWAP Trap",
+            "score": vsplit["strength"],
+            "reasons": [vsplit["reason"]] if vsplit["reason"] else ["No V-Split"],
+            "trap_type": vsplit["type"] if vsplit["type"] else "VWAP Trap",
             "spoof_ratio": round(bids / asks, 2) if asks else 0,
             "bias": "Below" if last_close < vwap else "Above",
-            "confidence": round(vsplit_score, 1),
-            "rsi_status": vsplit_reason if vsplit_score >= 2 else "None",
+            "confidence": round(vsplit["strength"], 1),
+            "rsi_status": vsplit["type"] if vsplit["type"] else "None",
             "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range"
         }
 
