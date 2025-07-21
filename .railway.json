@@ -6,7 +6,7 @@
   "deploy": {
     "runtime": "V2",
     "numReplicas": 1,
-    "startCommand": "python3 gpt_overseer.py",
+   "startCommand": "python3 reflex_agent.py",
     "sleepApplication": false,
     "multiRegionConfig": {
       "europe-west4-drams3a": {
