@@ -1,75 +1,89 @@
-# gpt_reflex.py
-# Reflex loop for GPT-based self-monitoring agent
+# reflex_agent.py
+# GPT Reflex Agent for Recursive AI Oversight
 
 import os
 import json
 import time
 import requests
 from openai import OpenAI
+from datetime import datetime
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DISCORD_OVERSEER_WEBHOOK = os.getenv("DISCORD_OVERSEER_WEBHOOK")
-
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-def build_prompt():
-    return (
-        "You are the Reflex Commander of a live sniper AI system.\n"
-        "Only reply with a valid JSON object using these keys:\n"
-        "- summary: A 1-sentence high-level explanation\n"
-        "- confidence: A numeric value from 0 to 10\n"
-        "- macro_bias: One of 'Bullish', 'Bearish', or 'Neutral'\n"
-        "- orders: A list of short bullet points (actions or alerts)"
-    )
+REFLEX_LOG = "logs/reflex_memory.json"
 
-def run_reflex():
-    prompt = build_prompt()
+def read_last_reflex():
+    try:
+        with open(REFLEX_LOG, "r") as f:
+            return json.load(f)
+    except:
+        return {}
+
+def save_reflex_memory(data):
+    try:
+        with open(REFLEX_LOG, "w") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        print(f"[✘] Failed to save reflex memory: {e}")
+
+def build_reflex_prompt(previous=None):
+    base = "You are Reflex, a strategic AI overseeing a sniper trading system. Your job is to summarize recent performance, evaluate risk, macro alignment, confidence, and recommend adjustments.\n\n"
+
+    if previous:
+        base += f"Last Reflex Report:\n{json.dumps(previous, indent=2)}\n\n"
+        base += "Reflect on that and generate an updated assessment."
+
+    return base
+
+def analyze_and_respond():
+    previous = read_last_reflex()
+    prompt = build_reflex_prompt(previous)
+
     print("[Reflex] Thinking...")
-
     try:
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {
-                    "role": "system",
-                    "content": prompt
-                },
-                {
-                    "role": "user",
-                    "content": "Evaluate the sniper logs and macro data from today."
-                }
+                {"role": "system", "content": "You are Reflex AI. Analyze system performance and recommend adjustments."},
+                {"role": "user", "content": prompt}
             ]
         )
-
-        raw = response.choices[0].message.content.strip()
-        print("[Reflex] Raw Response:\n", raw)
-
-        result = json.loads(raw)
+        result = response.choices[0].message.content.strip()
         return result
     except Exception as e:
-        print("[Reflex ERROR]", e)
-        return None
+        return f"[Reflex Error] {e}"
 
-def send_to_discord(report):
-    message = f"**🤖 Reflex Report**\n\n"
-    message += f"**Summary:** {report['summary']}\n"
-    message += f"**Confidence:** `{report['confidence']}/10`\n"
-    message += f"**Macro Bias:** `{report['macro_bias']}`\n"
-    message += "**Orders:**\n" + "\n".join([f"- {o}" for o in report["orders"]])
+def parse_json_summary(text):
+    try:
+        start = text.find("{")
+        return json.loads(text[start:])
+    except Exception as e:
+        print(f"[✘] Reflex Parse Error: {e}")
+        return {}
 
+def send_to_discord(summary_text):
     payload = {
         "username": "GPT Reflex",
-        "content": message
+        "content": f"🧠 **Reflex Report**\n```json\n{summary_text}\n```"
     }
-
     try:
-        requests.post(DISCORD_OVERSEER_WEBHOOK, json=payload)
-        print("[✓] Reflex report sent to Discord.")
+        res = requests.post(DISCORD_OVERSEER_WEBHOOK, json=payload)
+        if res.status_code in [200, 204]:
+            print("[✓] Reflex report sent to Discord.")
+        else:
+            print(f"[!] Discord Error {res.status_code}: {res.text}")
     except Exception as e:
-        print("[!] Discord post failed:", e)
+        print(f"[!] Discord post failed: {e}")
 
+# Run Reflex Loop
 if __name__ == "__main__":
-    print("[✓] Reflex loop running...")
-    result = run_reflex()
-    if result:
-        send_to_discord(result)
+    print("🔁 Reflex loop running...")
+    result = analyze_and_respond()
+    print("[✓] Reflex response received.")
+
+    memory = parse_json_summary(result)
+    if memory:
+        save_reflex_memory(memory)
+    send_to_discord(result)
