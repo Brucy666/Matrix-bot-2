@@ -1,82 +1,77 @@
 # gpt_overseer.py
-# Overseer module to let GPT analyze the system's sniper logs, scores, and trade behavior
+# Overseer AI: Evaluates sniper logs, trade activity, and generates reports for Discord
 
 import os
-import time
-import json
 import requests
 from datetime import datetime
+from openai import OpenAI
 
+# ───── Environment ─────
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DISCORD_OVERSEER_WEBHOOK = os.getenv("DISCORD_OVERSEER_WEBHOOK")
-
 LOG_FILE = "logs/trap_journal.csv"
 ACTIVE_TRADES = "logs/active_trades.json"
 
-from openai import OpenAI
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# Helper: Format prompt from journal + trade states
-def build_prompt():
-    journal = "[JOURNAL]\n"
+# ───── Utilities ─────
+def read_log_file(path, fallback_message, limit_chars=None):
     try:
-        with open(LOG_FILE, "r") as f:
-            journal += f.read()[-5000:]  # last 5000 chars
-    except:
-        journal += "(No trap journal found)"
+        with open(path, "r") as file:
+            data = file.read()
+            return data[-limit_chars:] if limit_chars else data
+    except FileNotFoundError:
+        return fallback_message
 
-    trades = "[ACTIVE TRADES]\n"
-    try:
-        with open(ACTIVE_TRADES, "r") as f:
-            trades += f.read()
-    except:
-        trades += "(No active trades)"
+# ───── Prompt Builder ─────
+def build_overseer_prompt():
+    journal_section = read_log_file(LOG_FILE, "(No trap journal found)", limit_chars=5000)
+    trades_section = read_log_file(ACTIVE_TRADES, "(No active trades)")
 
-    prompt = f"""
+    return f"""
 You are the GPT Overseer of a sniper trading system.
-Review the recent sniper traps and active trade logs.
 
 Your tasks:
 1. Summarize which sniper trades triggered
 2. Determine if they were valid entries
-3. Note if any exits were missed (score decay, RSI collapse, VWAP loss, etc)
-4. Suggest any improvements
-5. Highlight high-performing signals or exchanges
+3. Flag any missed exits (e.g., RSI collapse, score decay, VWAP lost)
+4. Suggest improvements to scoring or logic
+5. Highlight top-performing signals or exchanges
 
-{journal}
+[JOURNAL]
+{journal_section}
 
-{trades}
+[ACTIVE TRADES]
+{trades_section}
 
-Now provide a clear summary in Markdown.
+Now return a short markdown-formatted report.
 """
-    return prompt
 
-# GPT call
+# ───── GPT Analysis ─────
 def run_overseer_analysis():
-    prompt = build_prompt()
-    print("[OVERSEER] Calling GPT...")
-    
+    prompt = build_overseer_prompt()
+    print("[OVERSEER] Sending prompt to GPT...")
+
     try:
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are the strategist overseeing a live sniper trading system."},
+                {"role": "system", "content": "You are the senior strategist overseeing live sniper trade execution."},
                 {"role": "user", "content": prompt}
             ]
         )
-
-        result = response.choices[0].message.content.strip()
-        print("[OVERSEER] GPT response received.")
-        return result
+        return response.choices[0].message.content.strip()
     except Exception as e:
-        return f"[OVERSEER ERROR] {e}"
+        print(f"[!] GPT error: {e}")
+        return f"**[OVERSEER ERROR]** {e}"
 
-# Send to Discord
-def send_to_discord(message):
+# ───── Discord Report ─────
+def send_to_discord(content):
     payload = {
         "username": "GPT Overseer",
-        "content": message
+        "content": content
     }
+
     try:
         res = requests.post(DISCORD_OVERSEER_WEBHOOK, json=payload)
         if res.status_code in [200, 204]:
@@ -84,9 +79,10 @@ def send_to_discord(message):
         else:
             print(f"[!] Discord error {res.status_code}: {res.text}")
     except Exception as e:
-        print(f"[!] Discord post failed: {e}")
+        print(f"[!] Failed to send to Discord: {e}")
 
-# Main
+# ───── Main ─────
 if __name__ == "__main__":
+    print("[✓] GPT Overseer initialized.")
     summary = run_overseer_analysis()
     send_to_discord(summary)
