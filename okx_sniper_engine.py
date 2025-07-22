@@ -1,80 +1,32 @@
 # okx_sniper_engine.py
-# OKX sniper logic using RSI-V + VWAP trap scoring
+# Simple OKX feed test (no V-Split or scoring logic)
 
 from okx_feed import get_okx_ohlcv, fetch_okx_orderbook
-from sniper_score import score_vsplit_vwap
-from spoof_score_engine import apply_binance_spoof_scoring
-from trap_journal import log_sniper_event
-from discord_alert import send_discord_alert
-from rsi_vsplit_engine import detect_rsi_vsplit
-import numpy as np
 from datetime import datetime
 
-print("[✓] OKX Sniper Engine Started for BTC-USDT...")
+print("[✓] OKX Feed Test Initialized...")
 
 def run_okx_sniper():
     df = get_okx_ohlcv()
-    if df is None or len(df) < 20:
-        print("[OKX SNIPER] No data returned from OKX feed.")
+    if df is None or len(df) < 2:
+        print("[OKX] Feed error: No valid OHLCV data.")
         return
 
     try:
-        close_prices = df["close"].astype(float).tolist()
-        volume = df["volume"].astype(float).tolist()
-        vwap = float(np.average(close_prices, weights=volume))
-        last_close = float(close_prices[-1])
+        last_row = df.iloc[-1]
+        print("[OKX] Last Close:", last_row["close"])
+        print("[OKX] Last Volume:", last_row["volume"])
+        print("[OKX] Timestamp:", last_row["timestamp"])
 
-        # Estimate simple RSI from close series
-        price_changes = np.diff(close_prices)
-        avg_gain = np.mean([x for x in price_changes if x > 0])
-        avg_loss = abs(np.mean([x for x in price_changes if x < 0]))
-        rs = avg_gain / avg_loss if avg_loss != 0 else 0.001
-        rsi_now = 100 - (100 / (1 + rs))
-
-        # Order book spoof ratio
         bids, asks = fetch_okx_orderbook()
-        total_bids = sum(q for _, q in bids)
-        total_asks = sum(q for _, q in asks)
-
-        # Score the trap setup
-        score, reasons = score_vsplit_vwap({
-            "rsi": [rsi_now],
-            "price": last_close,
-            "vwap": vwap,
-            "bids": total_bids,
-            "asks": total_asks
-        })
-
-        vsplit_status = detect_rsi_vsplit(df)
-        confidence = round(score + (1 if vsplit_status else 0), 1)
-
-        trap = {
-            "symbol": "BTC/USDT",
-            "exchange": "OKX",
-            "timestamp": datetime.utcnow().isoformat(),
-            "entry_price": last_close,
-            "vwap": round(vwap, 2),
-            "rsi": round(rsi_now, 2),
-            "score": score,
-            "confidence": confidence,
-            "reasons": reasons,
-            "trap_type": "RSI-V + VWAP Trap",
-            "spoof_ratio": round(total_bids / total_asks, 3) if total_asks else 0,
-            "bias": "Below" if last_close < vwap else "Above",
-            "rsi_status": vsplit_status or "None",
-            "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
-            "macro_vsplit": [],
-            "macro_biases": []
-        }
-
-        trap = apply_binance_spoof_scoring(trap)
-        log_sniper_event(trap)
-        send_discord_alert(trap)
-
-        if trap["score"] >= 2:
-            print("[TRIGGER] OKX Sniper Entry:", trap)
+        if bids and asks:
+            print("[OKX] Top Bid:", bids[0])
+            print("[OKX] Top Ask:", asks[0])
         else:
-            print(f"[OKX SNIPER] No trap. Score: {trap['score']}, RSI: {rsi_now}, Price: {last_close}")
+            print("[OKX] Orderbook data unavailable.")
 
     except Exception as e:
-        print(f"[!] OKX Sniper Error: {e}")
+        print("[OKX FEED TEST ERROR]", e)
+
+if __name__ == "__main__":
+    run_okx_sniper()
