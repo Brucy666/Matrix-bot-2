@@ -7,7 +7,6 @@ from spoof_score_engine import apply_binance_spoof_scoring
 from trap_journal import log_sniper_event
 from discord_alert import send_discord_alert
 from rsi_vsplit_engine import detect_rsi_vsplit
-
 import numpy as np
 from datetime import datetime
 
@@ -15,42 +14,37 @@ print("[✓] OKX Sniper Engine Started for BTC-USDT...")
 
 def run_okx_sniper():
     df = get_okx_ohlcv()
-    if df is None or df.empty or len(df.columns) < 8:
-        print("[OKX SNIPER] No data or malformed dataframe from OKX feed.")
+    if df is None or len(df) < 20:
+        print("[OKX SNIPER] No data returned from OKX feed.")
         return
 
     try:
-        # Convert to float and extract
-        df["close"] = df["close"].astype(float)
-        df["volume"] = df["volume"].astype(float)
-        close_prices = df["close"].tolist()
+        close_prices = df["close"].astype(float).tolist()
+        volume = df["volume"].astype(float).tolist()
+        vwap = float(np.average(close_prices, weights=volume))
+        last_close = float(close_prices[-1])
 
-        # Custom RSI calculation (smoothed)
-        rsi_series = df["close"].rolling(14).apply(
-            lambda x: (100 - (100 / (1 + x.pct_change().mean()))) if x.pct_change().mean() else 0
-        ).fillna(0).tolist()
+        # Estimate simple RSI from close series
+        price_changes = np.diff(close_prices)
+        avg_gain = np.mean([x for x in price_changes if x > 0])
+        avg_loss = abs(np.mean([x for x in price_changes if x < 0]))
+        rs = avg_gain / avg_loss if avg_loss != 0 else 0.001
+        rsi_now = 100 - (100 / (1 + rs))
 
-        last_close = close_prices[-1]
-        rsi_now = rsi_series[-1]
-
-        # Simple VWAP estimate
-        vwap = float(np.average(close_prices, weights=df["volume"]))
-
-        # Orderbook data
+        # Order book spoof ratio
         bids, asks = fetch_okx_orderbook()
         total_bids = sum(q for _, q in bids)
         total_asks = sum(q for _, q in asks)
 
-        # Run scoring
+        # Score the trap setup
         score, reasons = score_vsplit_vwap({
-            "rsi": rsi_series,
+            "rsi": [rsi_now],
             "price": last_close,
             "vwap": vwap,
             "bids": total_bids,
             "asks": total_asks
         })
 
-        # V-split pattern detection (pass full df as expected)
         vsplit_status = detect_rsi_vsplit(df)
         confidence = round(score + (1 if vsplit_status else 0), 1)
 
@@ -73,10 +67,7 @@ def run_okx_sniper():
             "macro_biases": []
         }
 
-        # Add spoof scoring adjustments
         trap = apply_binance_spoof_scoring(trap)
-
-        # Log + alert
         log_sniper_event(trap)
         send_discord_alert(trap)
 
