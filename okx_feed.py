@@ -1,5 +1,5 @@
 # okx_feed.py
-# ✅ OKX Feed Module: OHLCV + Orderbook for BTC Sniper Engine
+# Pulls OHLCV and order book data from OKX
 
 import requests
 import pandas as pd
@@ -7,9 +7,7 @@ import pandas as pd
 BASE_URL = "https://www.okx.com"
 HEADERS = {"Accept": "application/json"}
 
-# ----------------------------------------
-# ✅ Safe OHLCV Fetcher
-# ----------------------------------------
+# ✅ OHLCV fetcher (updated to support 9 columns)
 def get_okx_ohlcv(symbol="BTC-USDT", interval="1m", limit=100):
     url = f"{BASE_URL}/api/v5/market/candles"
     params = {
@@ -19,32 +17,23 @@ def get_okx_ohlcv(symbol="BTC-USDT", interval="1m", limit=100):
     }
 
     try:
-        res = requests.get(url, headers=HEADERS, params=params, timeout=5)
+        res = requests.get(url, headers=HEADERS, params=params)
         res.raise_for_status()
-        raw = res.json().get("data", [])
+        data = res.json().get("data", [])
 
-        if not raw or len(raw) == 0:
-            print("[OKX FEED] ⚠️ No OHLCV data returned.")
-            return None
-
-        # Convert to DataFrame
-        df = pd.DataFrame(raw[::-1], columns=[
-            "ts", "open", "high", "low", "close", "volume", "volCcy", "volCcyQuote"
+        # OKX now returns 9 columns; map accordingly
+        df = pd.DataFrame(data[::-1], columns=[
+            "ts", "open", "high", "low", "close", "volume", "volumeCcy", "volumeCcyQuote", "confirm"
         ])
         df["timestamp"] = pd.to_datetime(df["ts"].astype(float), unit="ms")
         df["close"] = df["close"].astype(float)
         df["volume"] = df["volume"].astype(float)
-
-        print(f"[OKX FEED] ✅ OHLCV rows: {len(df)}")
         return df
-
     except Exception as e:
-        print("[OKX FEED ERROR]", e)
+        print("[OKX ERROR]", e)
         return None
 
-# ----------------------------------------
-# ✅ Order Book Snapshot
-# ----------------------------------------
+# ✅ Order book fetcher
 def fetch_okx_orderbook(symbol="BTC-USDT", depth=40):
     url = f"{BASE_URL}/api/v5/market/books"
     params = {
@@ -53,32 +42,21 @@ def fetch_okx_orderbook(symbol="BTC-USDT", depth=40):
     }
 
     try:
-        res = requests.get(url, headers=HEADERS, params=params, timeout=5)
+        res = requests.get(url, headers=HEADERS, params=params)
         res.raise_for_status()
-        data = res.json().get("data", [])
+        data = res.json().get("data", [])[0]
 
-        if not data or "bids" not in data[0] or "asks" not in data[0]:
-            print("[OKX OB] ⚠️ Incomplete order book returned.")
-            return [], []
-
-        bids = [(float(p), float(q)) for p, q, *_ in data[0]["bids"]]
-        asks = [(float(p), float(q)) for p, q, *_ in data[0]["asks"]]
-
-        print(f"[OKX OB] ✅ Bids: {len(bids)} | Asks: {len(asks)}")
+        bids = [(float(p), float(q)) for p, q, *_ in data["bids"]]
+        asks = [(float(p), float(q)) for p, q, *_ in data["asks"]]
         return bids, asks
-
     except Exception as e:
         print("[OKX OB ERROR]", e)
         return [], []
 
-# ----------------------------------------
-# 🔧 Test Mode
-# ----------------------------------------
+# 🔧 Example test
 if __name__ == "__main__":
     df = get_okx_ohlcv()
-    if df is not None:
-        print(df[["timestamp", "close", "volume"]].tail())
+    print(df.tail())
 
     bids, asks = fetch_okx_orderbook()
-    if bids and asks:
-        print("Top Bid:", bids[0], "Top Ask:", asks[0])
+    print("Top Bid:", bids[0] if bids else "N/A", "Top Ask:", asks[0] if asks else "N/A")
