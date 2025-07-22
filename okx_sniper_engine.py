@@ -51,7 +51,7 @@ def run_okx_sniper():
         })
 
         # V-split pattern detection (pass full df as expected)
-        vsplit_status = detect_rsi_vsplit(df)
+        vsplit_status = detect_rsi_vsplit(df, rsi_now)
         confidence = round(score + (1 if vsplit_status else 0), 1)
 
         trap = {
