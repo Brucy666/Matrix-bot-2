@@ -3,3 +3,5 @@ numpy
 pandas
 python-dotenv
 openai
+fastapi
+uvicorn
