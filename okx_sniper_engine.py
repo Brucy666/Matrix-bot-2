@@ -1,10 +1,12 @@
 # okx_sniper_engine.py
-# Simple OKX feed test (no V-Split or scoring logic)
+# OKX sniper logic using feed test only (no V-split scoring yet)
 
 from okx_feed import get_okx_ohlcv, fetch_okx_orderbook
+from discord_alert import send_discord_alert
 from datetime import datetime
+import numpy as np
 
-print("[✓] OKX Feed Test Initialized...")
+print("[✓] OKX Sniper Engine Running...")
 
 def run_okx_sniper():
     df = get_okx_ohlcv()
@@ -14,16 +16,35 @@ def run_okx_sniper():
 
     try:
         last_row = df.iloc[-1]
-        print("[OKX] Last Close:", last_row["close"])
-        print("[OKX] Last Volume:", last_row["volume"])
-        print("[OKX] Timestamp:", last_row["timestamp"])
+        last_close = float(last_row["close"])
+        last_vol = float(last_row["volume"])
+        last_ts = str(last_row["timestamp"])
 
         bids, asks = fetch_okx_orderbook()
-        if bids and asks:
-            print("[OKX] Top Bid:", bids[0])
-            print("[OKX] Top Ask:", asks[0])
-        else:
-            print("[OKX] Orderbook data unavailable.")
+        top_bid = bids[0] if bids else (0, 0)
+        top_ask = asks[0] if asks else (0, 0)
+
+        print("[OKX] Price:", last_close)
+        print("[OKX] Volume:", last_vol)
+        print("[OKX] Top Bid:", top_bid)
+        print("[OKX] Top Ask:", top_ask)
+
+        # Format dummy trap data for Discord test
+        trap = {
+            "symbol": "BTC/USDT",
+            "exchange": "OKX",
+            "score": 1.0,
+            "spoof_ratio": round(top_bid[1] / top_ask[1], 3) if top_ask[1] else 0.0,
+            "bias": "Below" if last_close < (top_bid[0] + top_ask[0]) / 2 else "Above",
+            "trap_type": "Feed Check",
+            "rsi_status": "None",
+            "confidence": 1.0,
+            "vsplit_score": "Feed Only",
+            "macro_biases": [],
+            "macro_vsplit": []
+        }
+
+        send_discord_alert(trap)
 
     except Exception as e:
         print("[OKX FEED TEST ERROR]", e)
