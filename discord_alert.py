@@ -3,8 +3,7 @@ import requests
 from datetime import datetime
 import os
 
-DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK") or "https://discord.com/api/webhooks/REPLACE_THIS"
-
+DISCORD_WEBHOOK = os.getenv("DISCORD_OVERSEER_WEBHOOK")
 
 def format_discord_alert(trade_data):
     symbol = trade_data.get("symbol", "N/A")
@@ -18,9 +17,6 @@ def format_discord_alert(trade_data):
     vsetup = trade_data.get("vsplit_score", "None")
     macro = trade_data.get("macro_biases", [])
     macro_summary = trade_data.get("macro_vsplit", [])
-    echo_v = trade_data.get("echo_v_status", "None")
-    echo_tf = trade_data.get("echo_v_tf_confluence", [])
-    price = trade_data.get("price", "?")
     timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
 
     # Emojis
@@ -35,32 +31,36 @@ def format_discord_alert(trade_data):
         "RSI Sync Down": "⬇️"
     }.get(rsi_status, "📊")
     v_emoji = "🔵" if "vwap" in str(vsetup).lower() else "🟣" if "split" in str(vsetup).lower() else "❌"
-    echo_emoji = "✅" if echo_v != "None" else "❌"
+
+    # Format macro summary lines
+    macro_v_lines = []
+    if macro_summary:
+        for entry in macro_summary:
+            macro_v_lines.append(f"• {entry}")
+    else:
+        macro_v_lines.append("None")
+    macro_v_text = "\n".join(macro_v_lines)
 
     macro_bias_text = macro[0] if macro else "Unclassified"
     macro_bias_emoji = "🔺" if "Bull" in macro_bias_text else "🔻" if "Bear" in macro_bias_text else "➖"
-    macro_v_text = "\n".join(f"• {line}" for line in macro_summary) or "None"
-    echo_tf_text = "\n".join(echo_tf) if echo_tf else "None"
 
     return {
         "username": "QuickStrike Bot",
         "embeds": [
             {
-                "title": f"🎯 Sniper Signal — {exchange}",
+                "title": "🎯 Sniper Trade Executed",
                 "color": 0x00ffae if bias == "Above" else 0xff5555,
                 "fields": [
-                    {"name": "Symbol", "value": f"`{symbol}`", "inline": True},
+                    {"name": "Token", "value": f"`{symbol}`", "inline": True},
+                    {"name": "Exchange", "value": f"`{exchange}`", "inline": True},
                     {"name": "Bias", "value": f"{emoji} `{bias}`", "inline": True},
                     {"name": "Spoof Ratio", "value": f"{spoof_emoji} `{spoof:.3f}`", "inline": True},
                     {"name": "Trap Type", "value": f"`{trap_type}`", "inline": True},
                     {"name": "RSI Signal", "value": f"{rsi_emoji} `{rsi_status}`", "inline": True},
                     {"name": "VWAP Setup", "value": f"{v_emoji} `{vsetup}`", "inline": True},
-                    {"name": "Echo V", "value": f"{echo_emoji} `{echo_v}`", "inline": True},
                     {"name": "Confidence", "value": f"{confidence_emoji} `{confidence}/10`", "inline": True},
-                    {"name": "Price", "value": f"`{price}`", "inline": True},
                     {"name": "Macro Bias", "value": f"{macro_bias_emoji} `{macro_bias_text}`", "inline": False},
                     {"name": "Macro V-Splits", "value": f"```\n{macro_v_text}```", "inline": False},
-                    {"name": "Echo V TF Confluence", "value": f"```\n{echo_tf_text}```", "inline": False},
                     {"name": "Timestamp", "value": f"`{timestamp}`", "inline": False}
                 ],
                 "footer": {"text": "QuickStrike Sniper Feed"}
