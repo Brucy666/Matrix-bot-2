@@ -35,8 +35,8 @@ def run_btc_sniper():
             "rsi": df['rsi'].tolist()
         })
 
-        echo = detect_echo_vsplit(df)
-        confidence = round(score + echo['strength'], 1)
+        echo_status = detect_echo_v(df)
+        confidence = round(score, 1)
 
         trap = {
             "symbol": "BTC/USDT",
@@ -51,7 +51,7 @@ def run_btc_sniper():
             "trap_type": "RSI-ECHO + VWAP Trap",
             "spoof_ratio": round(bids / asks, 2) if asks else 0,
             "bias": "Below" if last_close < vwap else "Above",
-            "rsi_status": echo['status'],
+            "rsi_status": echo_status,
             "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
             "macro_vsplit": [],
             "macro_biases": []
