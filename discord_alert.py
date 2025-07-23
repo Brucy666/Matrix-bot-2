@@ -1,8 +1,11 @@
-# discord_alert.py
+# discord_alert.py (rewritten for RSI-V + Echo-V multi-timeframe tracking)
+
 import requests
 from datetime import datetime
+import os
 
-DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1395380527938404363/e7RT8fXbH14NuInl0x-Z3uy111KjRZ78JcOkdHLmlnWZiwTfBQedGg43p3FpJ9ZSU3Xg"
+DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
+
 
 def format_discord_alert(trade_data):
     symbol = trade_data.get("symbol", "N/A")
@@ -11,33 +14,20 @@ def format_discord_alert(trade_data):
     spoof = trade_data.get("spoof_ratio", 0)
     bias = trade_data.get("bias", "Unknown").capitalize()
     trap_type = trade_data.get("trap_type", "Unclassified")
-    rsi_status = trade_data.get("rsi_status", "None")
     confidence = trade_data.get("confidence", 0)
-    vsetup = trade_data.get("vsplit_score", "None")
-    echo_v = trade_data.get("echo_v", "None")
-    macro = trade_data.get("macro_biases", [])
-    macro_summary = trade_data.get("macro_vsplit", [])
+    macro_bias = trade_data.get("macro_biases", ["Unclassified"])[0]
+    macro_splits = trade_data.get("macro_vsplit", ["None"])
+    echo_v = trade_data.get("echo_v", {})
+    rsi_v = trade_data.get("rsi_vsplit", {})
     timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
 
-    # Emojis
     emoji = "📉" if bias == "Below" else "📈"
     spoof_emoji = "🟢" if spoof < 0.3 else "🟠" if spoof < 0.6 else "🔴"
     confidence_emoji = "🧠" if confidence >= 8 else "⚠️" if confidence >= 5 else "💤"
-    rsi_emoji = {
-        "RSI V-Split": "💥",
-        "RSI Collapse": "🔥",
-        "RSI Compression": "📡",
-        "RSI Sync Up": "⬆️",
-        "RSI Sync Down": "⬇️"
-    }.get(rsi_status, "📊")
-    v_emoji = "🔵" if "vwap" in str(vsetup).lower() else "🟣" if "split" in str(vsetup).lower() else "❌"
-    echo_emoji = "🎯" if echo_v != "None" else "❌"
 
-    # Macro format
-    macro_lines = [f"• {entry}" for entry in macro_summary] if macro_summary else ["None"]
-    macro_text = "\n".join(macro_lines)
-    macro_bias = macro[0] if macro else "Unclassified"
-    macro_bias_emoji = "🔺" if "Bull" in macro_bias else "🔻" if "Bear" in macro_bias else "➖"
+    echo_lines = [f"• {tf}: {val}" for tf, val in echo_v.items()] or ["None"]
+    rsi_v_lines = [f"• {tf}: {val}" for tf, val in rsi_v.items()] or ["None"]
+    macro_v_lines = [f"• {entry}" for entry in macro_splits] or ["None"]
 
     return {
         "username": "QuickStrike Bot",
@@ -50,18 +40,18 @@ def format_discord_alert(trade_data):
                     {"name": "Bias", "value": f"{emoji} `{bias}`", "inline": True},
                     {"name": "Spoof Ratio", "value": f"{spoof_emoji} `{spoof:.3f}`", "inline": True},
                     {"name": "Trap Type", "value": f"`{trap_type}`", "inline": True},
-                    {"name": "RSI Signal", "value": f"{rsi_emoji} `{rsi_status}`", "inline": True},
-                    {"name": "VWAP Setup", "value": f"{v_emoji} `{vsetup}`", "inline": True},
-                    {"name": "Echo V", "value": f"{echo_emoji} `{echo_v}`", "inline": True},
                     {"name": "Confidence", "value": f"{confidence_emoji} `{confidence}/10`", "inline": True},
-                    {"name": "Macro Bias", "value": f"{macro_bias_emoji} `{macro_bias}`", "inline": False},
-                    {"name": "Macro V-Splits", "value": f"```\n{macro_text}```", "inline": False},
-                    {"name": "Timestamp", "value": f"`{timestamp}`", "inline": False}
+                    {"name": "Macro Bias", "value": f"`{macro_bias}`", "inline": True},
+                    {"name": "Echo V Stack", "value": "```\n" + "\n".join(echo_lines) + "```", "inline": False},
+                    {"name": "RSI-V Stack", "value": "```\n" + "\n".join(rsi_v_lines) + "```", "inline": False},
+                    {"name": "Macro V-Splits", "value": "```\n" + "\n".join(macro_v_lines) + "```", "inline": False},
+                    {"name": "Timestamp", "value": f"`{timestamp}`", "inline": False},
                 ],
                 "footer": {"text": "QuickStrike Sniper Feed"}
             }
         ]
     }
+
 
 def send_discord_alert(trade_data):
     payload = format_discord_alert(trade_data)
