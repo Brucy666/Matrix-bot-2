@@ -1,7 +1,7 @@
 # btc_sniper_engine.py
 
 from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
-from echo_v_engine import detect_echo_vsplit
+from echo_v_engine import get_echo_v_signal
 from sniper_score import score_vsplit_vwap
 from spoof_score_engine import apply_binance_spoof_scoring
 from trap_journal import log_sniper_event
@@ -18,14 +18,6 @@ def run_btc_sniper():
         return
 
     try:
-        # Fallback: create required OHLCV columns if missing
-        if 'open' not in df.columns:
-            df['open'] = df['close'].shift(1).fillna(df['close'])
-        if 'high' not in df.columns:
-            df['high'] = df['close']
-        if 'low' not in df.columns:
-            df['low'] = df['close']
-
         close_prices = df['close'].astype(float).tolist()
         volume = df['volume'].astype(float).tolist()
         last_close = float(close_prices[-1])
@@ -43,8 +35,10 @@ def run_btc_sniper():
             "rsi": df['rsi'].tolist()
         })
 
-        echo = detect_echo_vsplit(df)
-        confidence = round(score + echo['strength'], 1)
+        echo = get_echo_v_signal(df)
+        echo_status = echo.get("status", "None")
+        echo_strength = echo.get("strength", 0.0)
+        confidence = round(score + echo_strength, 1)
 
         trap = {
             "symbol": "BTC/USDT",
@@ -59,7 +53,7 @@ def run_btc_sniper():
             "trap_type": "RSI-ECHO + VWAP Trap",
             "spoof_ratio": round(bids / asks, 2) if asks else 0,
             "bias": "Below" if last_close < vwap else "Above",
-            "rsi_status": echo['status'],
+            "rsi_status": echo_status,
             "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
             "macro_vsplit": [],
             "macro_biases": []
