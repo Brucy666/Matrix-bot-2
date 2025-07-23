@@ -1,7 +1,7 @@
 # test_bot/test_sniper_loop.py
 
 import time
-from test_kucoin_echo_sniper import run_kucoin_test
+from kucoin_echo_sniper import run_kucoin_test
 
 print("[TEST LOOP] 🧪 Starting KuCoin Echo V Test Bot...")
 
