@@ -1,14 +1,13 @@
 # cme_webhook_receiver.py
-
 from fastapi import FastAPI, Request
 from datetime import datetime
 import json
-import os
 import requests
 
 app = FastAPI()
 
-DISCORD_WEBHOOK = os.getenv("DISCORD_OVERSEER_WEBHOOK")
+# ✅ Hardcoded webhook (for GPT Overseer)
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1396891353367056434/90hJyCgxIWKsQN71_yCOGGPULIYOJILguZPBxORR4sH3w9vkv8D8ITEvw3IrdwCnHOyF"
 LOG_FILE = "logs/cme_vsplit_alerts.txt"
 
 @app.post("/cme")
@@ -21,16 +20,15 @@ async def receive_cme_alert(request: Request):
         timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
         log_entry = f"[{timestamp}] {content}\n"
 
-        # Log to file
+        # Save log
         try:
             with open(LOG_FILE, "a") as f:
                 f.write(log_entry)
         except Exception as log_err:
             print("[CME LOG ERROR]", log_err)
 
-        # Format Discord message
+        # Format message for Discord
         if content.startswith("{") or content.startswith("["):
-            # JSON-style payload
             try:
                 parsed = json.loads(content)
                 pretty = json.dumps(parsed, indent=2)
@@ -41,13 +39,16 @@ async def receive_cme_alert(request: Request):
             message = f"🟡 **CME Alert** `{content}`"
 
         # Send to Discord
-        if DISCORD_WEBHOOK:
-            requests.post(DISCORD_WEBHOOK, json={
-                "username": "CME V-Alert",
-                "content": message
-            })
+        res = requests.post(DISCORD_WEBHOOK, json={
+            "username": "CME V-Alert",
+            "content": message
+        })
+
+        if res.status_code not in [200, 204]:
+            print(f"[!] Discord POST FAILED: {res.status_code} {res.text}")
 
         return {"status": "received", "timestamp": timestamp}
 
     except Exception as e:
+        print("[CME ERROR]", e)
         return {"status": "error", "detail": str(e)}
