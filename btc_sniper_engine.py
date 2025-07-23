@@ -32,11 +32,17 @@ def run_btc_sniper():
             "vwap": vwap,
             "bids": bids,
             "asks": asks,
-            "rsi": df['rsi'].tolist()
+            "rsi": df['rsi'].tolist() if 'rsi' in df.columns else []
         })
 
-        echo_status = detect_echo_v(df)
-        confidence = round(score, 1)
+        # Echo V Safety Check
+        required_cols = ['open', 'high', 'low', 'close']
+        if all(col in df.columns for col in required_cols) and len(df) > 15:
+            echo_status = detect_echo_v(df)
+        else:
+            echo_status = "Echo Feed Invalid"
+
+        confidence = round(score + (1 if 'Echo' in echo_status else 0), 1)
 
         trap = {
             "symbol": "BTC/USDT",
@@ -44,7 +50,7 @@ def run_btc_sniper():
             "timestamp": datetime.utcnow().isoformat(),
             "entry_price": last_close,
             "vwap": round(vwap, 2),
-            "rsi": round(df['rsi'].iloc[-1], 2),
+            "rsi": round(df['rsi'].iloc[-1], 2) if 'rsi' in df.columns else 0,
             "score": score,
             "confidence": confidence,
             "reasons": reasons,
