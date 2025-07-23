@@ -1,7 +1,7 @@
 # btc_sniper_engine.py
 
 from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
-from echo_v_engine import detect_echo_vsplit
+from echo_v_engine import detect_echo_v
 from sniper_score import score_vsplit_vwap
 from spoof_score_engine import apply_binance_spoof_scoring
 from trap_journal import log_sniper_event
