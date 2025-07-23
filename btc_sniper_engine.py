@@ -1,7 +1,7 @@
 # btc_sniper_engine.py
 
 from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
-from rsi_vsplit_engine import detect_rsi_vsplit
+from classic_vsplit_engine import detect_rsi_vsplit
 from multi_tf_vsplit_engine import scan_multi_tf_rsi
 from spoof_score_engine import apply_binance_spoof_scoring
 from trap_journal import log_sniper_event
@@ -19,9 +19,8 @@ def run_btc_sniper():
 
     try:
         close_prices = df['close'].astype(float).tolist()
-        rsi_series = df['rsi'].astype(float).tolist()
         volume = df['volume'].astype(float).tolist()
-
+        rsi_series = df['rsi'].astype(float).tolist()
         last_close = float(close_prices[-1])
         vwap = float(df['vwap'].iloc[-1]) if 'vwap' in df.columns else np.mean(close_prices)
 
@@ -33,26 +32,25 @@ def run_btc_sniper():
         fast_rsi = rsi_series
         slow_rsi = df['rsi'].rolling(8).mean().fillna(50).astype(float).tolist()
 
-        # Detect primary RSI-V signal
+        # Detect RSI-V pattern
         vsplit = detect_rsi_vsplit(fast_rsi, slow_rsi)
 
         # Retrieve macro V-Split summary
         macro_summary, macro_bias = scan_multi_tf_rsi()
 
-        # Trap payload
         trap = {
             "symbol": "BTC/USDT",
             "exchange": "KuCoin",
             "timestamp": datetime.utcnow().isoformat(),
             "entry_price": last_close,
             "vwap": round(vwap, 2),
-            "rsi": round(rsi_series[-1], 2),
+            "rsi": round(df['rsi'].iloc[-1], 2),
             "score": vsplit["strength"],
+            "confidence": round(vsplit["strength"], 1),
             "reasons": [vsplit["reason"]] if vsplit["reason"] else ["No V-Split"],
             "trap_type": vsplit["type"] if vsplit["type"] else "VWAP Trap",
             "spoof_ratio": round(bids / asks, 2) if asks else 0,
             "bias": "Below" if last_close < vwap else "Above",
-            "confidence": round(vsplit["strength"], 1),
             "rsi_status": vsplit["type"] if vsplit["type"] else "None",
             "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
             "macro_vsplit": [f"{s['timeframe']}: {s['type']} ({s['strength']})" for s in macro_summary],
@@ -65,10 +63,7 @@ def run_btc_sniper():
         elif macro_bias == "Strong Bear":
             trap["confidence"] -= 1
 
-        # Add spoof scoring
         trap = apply_binance_spoof_scoring(trap)
-
-        # Log and send alert
         log_sniper_event(trap)
         send_discord_alert(trap)
 
