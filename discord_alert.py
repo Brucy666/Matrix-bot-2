@@ -1,67 +1,47 @@
-# discord_alert.py (rewritten for RSI-V + Echo-V multi-timeframe tracking)
+x# trap_journal.py
+# Logs sniper signal entries to file for historical analysis
 
-import requests
-from datetime import datetime
 import os
+import csv
+from datetime import datetime
 
-DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
+LOG_FILE = "logs/trap_journal.csv"
+FIELDNAMES = [
+    "timestamp", "symbol", "exchange", "entry_price", "vwap", "rsi",
+    "trap_type", "score", "confidence", "bias", "spoof_ratio", "rsi_status",
+    "vsplit_score", "macro_vsplit", "macro_biases", "binance_bid_wall", "binance_ask_wall",
+    "echo_v_status", "echo_v_tf_confluence", "price"
+]
 
+def log_sniper_event(trap):
+    os.makedirs("logs", exist_ok=True)
+    file_exists = os.path.isfile(LOG_FILE)
 
-def format_discord_alert(trade_data):
-    symbol = trade_data.get("symbol", "N/A")
-    exchange = trade_data.get("exchange", "Unknown")
-    score = trade_data.get("score", 0)
-    spoof = trade_data.get("spoof_ratio", 0)
-    bias = trade_data.get("bias", "Unknown").capitalize()
-    trap_type = trade_data.get("trap_type", "Unclassified")
-    confidence = trade_data.get("confidence", 0)
-    macro_bias = trade_data.get("macro_biases", ["Unclassified"])[0]
-    macro_splits = trade_data.get("macro_vsplit", ["None"])
-    echo_v = trade_data.get("echo_v", {})
-    rsi_v = trade_data.get("rsi_vsplit", {})
-    timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
-
-    emoji = "📉" if bias == "Below" else "📈"
-    spoof_emoji = "🟢" if spoof < 0.3 else "🟠" if spoof < 0.6 else "🔴"
-    confidence_emoji = "🧠" if confidence >= 8 else "⚠️" if confidence >= 5 else "💤"
-
-    echo_lines = [f"• {tf}: {val}" for tf, val in echo_v.items()] or ["None"]
-    rsi_v_lines = [f"• {tf}: {val}" for tf, val in rsi_v.items()] or ["None"]
-    macro_v_lines = [f"• {entry}" for entry in macro_splits] or ["None"]
-
-    return {
-        "username": "QuickStrike Bot",
-        "embeds": [
-            {
-                "title": f"🎯 Sniper Signal — {exchange}",
-                "color": 0x00ffae if bias == "Above" else 0xff5555,
-                "fields": [
-                    {"name": "Symbol", "value": f"`{symbol}`", "inline": True},
-                    {"name": "Bias", "value": f"{emoji} `{bias}`", "inline": True},
-                    {"name": "Spoof Ratio", "value": f"{spoof_emoji} `{spoof:.3f}`", "inline": True},
-                    {"name": "Trap Type", "value": f"`{trap_type}`", "inline": True},
-                    {"name": "Confidence", "value": f"{confidence_emoji} `{confidence}/10`", "inline": True},
-                    {"name": "Macro Bias", "value": f"`{macro_bias}`", "inline": True},
-                    {"name": "Echo V Stack", "value": "```\n" + "\n".join(echo_lines) + "```", "inline": False},
-                    {"name": "RSI-V Stack", "value": "```\n" + "\n".join(rsi_v_lines) + "```", "inline": False},
-                    {"name": "Macro V-Splits", "value": "```\n" + "\n".join(macro_v_lines) + "```", "inline": False},
-                    {"name": "Timestamp", "value": f"`{timestamp}`", "inline": False},
-                ],
-                "footer": {"text": "QuickStrike Sniper Feed"}
-            }
-        ]
+    row = {
+        "timestamp": trap.get("timestamp", datetime.utcnow().isoformat()),
+        "symbol": trap.get("symbol", "N/A"),
+        "exchange": trap.get("exchange", "N/A"),
+        "entry_price": trap.get("entry_price", 0),
+        "vwap": trap.get("vwap", 0),
+        "rsi": trap.get("rsi", 0),
+        "trap_type": trap.get("trap_type", "N/A"),
+        "score": trap.get("score", 0),
+        "confidence": trap.get("confidence", 0),
+        "bias": trap.get("bias", "N/A"),
+        "spoof_ratio": trap.get("spoof_ratio", 0),
+        "rsi_status": trap.get("rsi_status", "None"),
+        "vsplit_score": trap.get("vsplit_score", "None"),
+        "macro_vsplit": ",".join(trap.get("macro_vsplit", [])),
+        "macro_biases": ",".join(trap.get("macro_biases", [])),
+        "binance_bid_wall": trap.get("binance_bid_wall", 0),
+        "binance_ask_wall": trap.get("binance_ask_wall", 0),
+        "echo_v_status": trap.get("echo_v_status", "None"),
+        "echo_v_tf_confluence": trap.get("echo_v_tf_confluence", "None"),
+        "price": trap.get("price", 0)
     }
 
-
-def send_discord_alert(trade_data):
-    payload = format_discord_alert(trade_data)
-    headers = {"Content-Type": "application/json"}
-
-    try:
-        res = requests.post(DISCORD_WEBHOOK, json=payload, headers=headers)
-        if res.status_code in [200, 204]:
-            print("[✓] Discord alert sent.")
-        else:
-            print(f"[!] Discord alert failed: {res.status_code}, {res.text}")
-    except Exception as e:
-        print(f"[!] Discord alert error: {e}")
+    with open(LOG_FILE, "a", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(row)
