@@ -1,12 +1,14 @@
-import time
-from kucoin_echo_sniper import run_echo_sniper
+# test_bot/test_sniper_loop.py
 
-print("[TEST LOOP] Running Echo RSI Bot...")
+import time
+from test_kucoin_echo_sniper import run_kucoin_test
+
+print("[TEST LOOP] 🧪 Starting KuCoin Echo V Test Bot...")
 
 while True:
+    print("\n[TEST LOOP] 🔁 New Test Cycle")
     try:
-        run_echo_sniper()
+        run_kucoin_test()
     except Exception as e:
-        print("[TEST ERROR]", e)
-
-    time.sleep(60)
+        print(f"[TEST ERROR] {e}")
+    time.sleep(30)  # Shorter loop for testing
