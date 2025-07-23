@@ -1,7 +1,7 @@
 # btc_sniper_engine.py
 
 from kucoin_feed import get_kucoin_sniper_feed, fetch_orderbook
-from echo_v_engine import detect_echo_v
+from echo_v_engine import detect_echo_vsplit
 from sniper_score import score_vsplit_vwap
 from spoof_score_engine import apply_binance_spoof_scoring
 from trap_journal import log_sniper_event
@@ -18,6 +18,14 @@ def run_btc_sniper():
         return
 
     try:
+        # Fallback: create required OHLCV columns if missing
+        if 'open' not in df.columns:
+            df['open'] = df['close'].shift(1).fillna(df['close'])
+        if 'high' not in df.columns:
+            df['high'] = df['close']
+        if 'low' not in df.columns:
+            df['low'] = df['close']
+
         close_prices = df['close'].astype(float).tolist()
         volume = df['volume'].astype(float).tolist()
         last_close = float(close_prices[-1])
@@ -32,17 +40,11 @@ def run_btc_sniper():
             "vwap": vwap,
             "bids": bids,
             "asks": asks,
-            "rsi": df['rsi'].tolist() if 'rsi' in df.columns else []
+            "rsi": df['rsi'].tolist()
         })
 
-        # Echo V Safety Check
-        required_cols = ['open', 'high', 'low', 'close']
-        if all(col in df.columns for col in required_cols) and len(df) > 15:
-            echo_status = detect_echo_v(df)
-        else:
-            echo_status = "Echo Feed Invalid"
-
-        confidence = round(score + (1 if 'Echo' in echo_status else 0), 1)
+        echo = detect_echo_vsplit(df)
+        confidence = round(score + echo['strength'], 1)
 
         trap = {
             "symbol": "BTC/USDT",
@@ -50,14 +52,14 @@ def run_btc_sniper():
             "timestamp": datetime.utcnow().isoformat(),
             "entry_price": last_close,
             "vwap": round(vwap, 2),
-            "rsi": round(df['rsi'].iloc[-1], 2) if 'rsi' in df.columns else 0,
+            "rsi": round(df['rsi'].iloc[-1], 2),
             "score": score,
             "confidence": confidence,
             "reasons": reasons,
             "trap_type": "RSI-ECHO + VWAP Trap",
             "spoof_ratio": round(bids / asks, 2) if asks else 0,
             "bias": "Below" if last_close < vwap else "Above",
-            "rsi_status": echo_status,
+            "rsi_status": echo['status'],
             "vsplit_score": "VWAP Zone" if abs(last_close - vwap) / vwap < 0.002 else "Outside Range",
             "macro_vsplit": [],
             "macro_biases": []
