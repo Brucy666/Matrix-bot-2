@@ -1,63 +1,67 @@
 # kucoin_feed.py
-# Stable KuCoin feed fetcher for sniper engine (fixed)
+# Multi-timeframe KuCoin data fetcher for Echo V Sniper Test Bot
 
-import pandas as pd
 import requests
+import pandas as pd
+import time
+import os
 
-KUCOIN_SYMBOL = "BTC-USDT"
-KUCOIN_ENDPOINT = f"https://api.kucoin.com/api/v1/market/candles"
+KUCOIN_API_KEY = os.getenv("KUCOIN_API_KEY")
+KUCOIN_URL = "https://api.kucoin.com/api/v1/market/candles"
 
-def get_kucoin_sniper_feed():
+HEADERS = {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "KC-API-KEY": KUCOIN_API_KEY,
+}
+
+# Mapping for KuCoin intervals
+INTERVAL_MAP = {
+    "1m": "1min",
+    "5m": "5min",
+    "15m": "15min",
+    "1h": "1hour"
+}
+
+# Fetch OHLCV data from KuCoin
+
+def fetch_kucoin_ohlcv(symbol="BTC-USDT", interval="1m", limit=100):
     try:
-        params = {
-            "type": "1min",
-            "symbol": KUCOIN_SYMBOL
-        }
-        res = requests.get(KUCOIN_ENDPOINT, params=params)
+        res = requests.get(KUCOIN_URL, params={
+            "type": INTERVAL_MAP[interval],
+            "symbol": symbol
+        }, timeout=10)
+
         if res.status_code != 200:
-            print("[KuCoin ERROR] HTTP", res.status_code)
+            print(f"[KUCOIN ERROR] {res.status_code}: {res.text}")
             return None
 
-        data = res.json()
-        if "data" not in data or not isinstance(data["data"], list):
-            print("[KuCoin ERROR] Invalid data format:", data)
+        data = res.json().get("data", [])
+        if not data:
             return None
 
-        candles = data["data"]
-        df = pd.DataFrame(candles, columns=[
-            "timestamp", "open", "close", "high", "low", "volume", "turnover"
-        ])
-        df = df.iloc[::-1].copy()
+        df = pd.DataFrame(data, columns=[
+            "timestamp", "open", "close", "high", "low", "volume", "turnover"])
+
+        df = df.iloc[::-1].reset_index(drop=True)
+        df["timestamp"] = pd.to_datetime(df["timestamp"].astype(float), unit="ms")
         df[["open", "close", "high", "low", "volume"]] = df[["open", "close", "high", "low", "volume"]].astype(float)
-        df["timestamp"] = pd.to_datetime(df["timestamp"].astype("int64"), unit="ms")
+        df["vwap"] = (df["high"] + df["low"] + df["close"]) / 3
 
-        # Calculate RSI
-        df["delta"] = df["close"].diff()
-        df["gain"] = df["delta"].clip(lower=0)
-        df["loss"] = -df["delta"].clip(upper=0)
-        df["avg_gain"] = df["gain"].rolling(14).mean()
-        df["avg_loss"] = df["loss"].rolling(14).mean()
-        rs = df["avg_gain"] / df["avg_loss"]
-        df["rsi"] = 100 - (100 / (1 + rs))
-
-        # VWAP estimate
-        df["vwap"] = (df["close"] * df["volume"]).cumsum() / df["volume"].cumsum()
-
-        return df.dropna()
+        return df.head(limit)
 
     except Exception as e:
-        print("[KuCoin FEED ERROR]", e)
+        print("[KUCOIN ERROR] API exception:", e)
         return None
 
+# Collect multiple timeframe data
 
-def fetch_orderbook():
-    try:
-        url = f"https://api.kucoin.com/api/v1/market/orderbook/level2_100"
-        params = {"symbol": KUCOIN_SYMBOL}
-        res = requests.get(url, params=params).json()
-        bids = sum(float(x[1]) for x in res["data"]["bids"])
-        asks = sum(float(x[1]) for x in res["data"]["asks"])
-        return {"bids": bids, "asks": asks}
-    except Exception as e:
-        print("[KuCoin Orderbook ERROR]", e)
-        return {"bids": 0, "asks": 0}
+def get_multi_tf_kucoin_data():
+    tf_data = {}
+    for tf in ["1m", "5m", "15m", "1h"]:
+        df = fetch_kucoin_ohlcv(interval=tf)
+        if df is not None:
+            tf_data[tf] = df
+        else:
+            print(f"[KUCOIN ERROR] No data for {tf}")
+    return tf_data
