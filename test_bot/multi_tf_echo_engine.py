@@ -1,47 +1,45 @@
 # multi_tf_echo_engine.py
-# Multi-timeframe Echo V AI Engine for KuCoin Test Bot
+# Multi-timeframe Echo V Signal Aggregator for KuCoin
 
 from echo_v_engine import detect_echo_vsplit
 
-# Define timeframes to scan
-ECHO_TIMEFRAMES = ["1m", "5m", "15m", "1h", "4h"]
+# ---- Timeframes to Process ----
+TF_LIST = ["4h", "1h", "30m", "15m", "6m", "3m"]
 
-# Analyze Echo pattern on each timeframe's dataframe
+# ---- Main Aggregator ----
 def get_multi_tf_echo_signals(tf_data_map: dict) -> dict:
-    results = {}
-    try:
-        for tf, df in tf_data_map.items():
-            echo = detect_echo_vsplit(df)
-            results[tf] = echo
-    except Exception as e:
-        print("[ECHO MULTI-TF ERROR]", e)
-    return results
+    results = []
 
-# Score confluence across all timeframes
-def score_echo_confluence(echo_results: dict) -> dict:
-    try:
-        matched = []
-        confidence = 0.0
+    for tf in TF_LIST:
+        df = tf_data_map.get(tf)
+        if df is None or len(df) < 20:
+            results.append({"tf": tf, "signal": "Missing", "strength": 0.0})
+            continue
 
-        for tf, result in echo_results.items():
-            status = result.get("status", "None")
-            strength = result.get("strength", 0.0)
+        try:
+            signal = detect_echo_vsplit(df)
+            results.append({
+                "tf": tf,
+                "signal": signal.get("status", "None"),
+                "strength": round(signal.get("strength", 0.0), 2)
+            })
+        except Exception as e:
+            results.append({"tf": tf, "signal": "Error", "strength": 0.0})
+            print(f"[ECHO {tf} ERROR]", e)
 
-            if status != "None":
-                matched.append(f"{tf}: {status} ({strength})")
-                confidence += strength * 0.25  # Weight TF strength
+    # ---- Final Decision Logic ----
+    vote_counter = {}
+    for r in results:
+        s = r["signal"]
+        if s not in vote_counter:
+            vote_counter[s] = 0
+        vote_counter[s] += 1
 
-        bias = "Bullish" if any("Bullish" in x for x in matched) else ("Bearish" if any("Bearish" in x for x in matched) else "Neutral")
+    dominant_signal = max(vote_counter, key=vote_counter.get, default="None")
+    avg_strength = round(sum(r["strength"] for r in results if r["signal"] == dominant_signal) / max(1, vote_counter[dominant_signal]), 2)
 
-        return {
-            "summary": matched,
-            "bias": bias,
-            "confidence": round(confidence, 2)
-        }
-    except Exception as e:
-        print("[ECHO CONFLUENCE ERROR]", e)
-        return {
-            "summary": [],
-            "bias": "Error",
-            "confidence": 0.0
-        }
+    return {
+        "echo_summary": results,
+        "dominant_signal": dominant_signal,
+        "avg_strength": avg_strength
+    }
