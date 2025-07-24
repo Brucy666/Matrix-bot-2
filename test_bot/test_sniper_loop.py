@@ -1,14 +1,34 @@
-# test_bot/test_sniper_loop.py
+# sniper_loop.py
 
 import time
-from kucoin_echo_sniper import run_kucoin_test
+from btc_sniper_engine import run_btc_sniper
+from bybit_sniper_engine import run_bybit_sniper
+from binance_sniper_engine import run_binance_sniper
+from okx_sniper_engine import run_okx_sniper
+from kucoin_echo_sniper import run_kucoin_echo_sniper  # 🔁 New Echo V AI Engine
 
-print("[TEST LOOP] 🧪 Starting KuCoin Echo V Test Bot...")
+print("[LOOP 🧠] 🚀 Starting Sniper Loop Engine...")
 
 while True:
-    print("\n[TEST LOOP] 🔁 New Test Cycle")
+    print("\n[LOOP] 🔁 Starting New Sniper Scan Cycle")
+
     try:
-        run_kucoin_test()
+        print("[LOOP] → KuCoin Sniper...")
+        run_btc_sniper()
     except Exception as e:
-        print(f"[TEST ERROR] {e}")
-    time.sleep(30)  # Shorter loop for testing
+        print(f"[KuCoin ERROR] {e}")
+
+    try:
+        print("[LOOP] → Bybit Sniper...")
+        run_bybit_sniper()
+    except Exception as e:
+        print(f"[Bybit ERROR] {e}")
+
+    try:
+        print("[LOOP] → Binance Sniper...")
+        run_binance_sniper()
+    except Exception as e:
+        print(f"[Binance ERROR] {e}")
+
+    try:
+        print
