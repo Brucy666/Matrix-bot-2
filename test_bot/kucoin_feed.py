@@ -1,49 +1,66 @@
 # kucoin_feed.py
-import requests
+# Data feed module for test bot (Echo V + other tools)
+
 import pandas as pd
+import requests
+import os
+import numpy as np
 
-KCS_BASE_URL = "https://api.kucoin.com"
+KUCOIN_SYMBOL = "BTC-USDT"
+API_BASE = "https://api.kucoin.com"
 
-def fetch_klines(symbol="BTC-USDT", interval="1min", limit=100):
-    url = f"{KCS_BASE_URL}/api/v1/market/candles"
-    params = {"symbol": symbol, "type": interval}
+def fetch_klines(symbol=KUCOIN_SYMBOL, interval='1min', limit=100):
     try:
-        response = requests.get(url, params=params, timeout=5)
-        response.raise_for_status()
-        return response.json().get("data", [])[:limit]
-    except Exception as e:
-        print(f"[!] Error fetching klines: {e}")
-        return []
+        url = f"{API_BASE}/api/v1/market/candles?type={interval}&symbol={symbol}&limit={limit}"
+        res = requests.get(url)
+        res.raise_for_status()
+        data = res.json().get("data", [])
 
-def fetch_orderbook(symbol="BTC-USDT"):
-    url = f"{KCS_BASE_URL}/api/v1/market/orderbook/level2_20"
-    params = {"symbol": symbol}
-    try:
-        response = requests.get(url, params=params, timeout=5)
-        response.raise_for_status()
-        data = response.json().get("data", {})
-        bids = data.get("bids", [])
-        asks = data.get("asks", [])
-        total_bids = sum(float(b[1]) for b in bids)
-        total_asks = sum(float(a[1]) for a in asks)
-        return {"bids": total_bids, "asks": total_asks}
-    except Exception as e:
-        print(f"[!] Error fetching orderbook: {e}")
-        return {"bids": 1.0, "asks": 1.0}
+        if not data:
+            print("[KuCoin FEED] No Kline data returned.")
+            return None
 
-# ✅ Sniper-ready feed function
-def get_kucoin_sniper_feed():
-    raw = fetch_klines()
-    if not raw or len(raw[0]) < 7:
+        df = pd.DataFrame(data, columns=["timestamp", "open", "close", "high", "low", "volume", "_"])
+        df = df.iloc[::-1]  # Reverse to chronological order
+
+        # Convert to floats and timestamp
+        for col in ["open", "high", "low", "close", "volume"]:
+            df[col] = df[col].astype(float)
+        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+
+        # Calculate RSI
+        delta = df["close"].diff()
+        gain = delta.clip(lower=0)
+        loss = -delta.clip(upper=0)
+        avg_gain = gain.rolling(window=14).mean()
+        avg_loss = loss.rolling(window=14).mean()
+        rs = avg_gain / avg_loss
+        df["rsi"] = 100 - (100 / (1 + rs))
+
+        # Calculate simple VWAP for context
+        df["vwap"] = (df["high"] + df["low"] + df["close"]) / 3
+
+        return df.dropna().reset_index(drop=True)
+
+    except Exception as e:
+        print(f"[KuCoin FEED ERROR] {e}")
         return None
 
-    # Transform into DataFrame
-    df = pd.DataFrame(raw, columns=[
-        "timestamp", "open", "close", "high", "low", "volume", "turnover"
-    ])
+def get_kucoin_sniper_feed():
+    return fetch_klines()
 
-    df = df.astype(float)
-    df["vwap"] = df["turnover"] / df["volume"]
-    df["rsi"] = df["close"].rolling(window=14).apply(lambda x: 100 - (100 / (1 + (x.diff().clip(lower=0).mean() / abs(x.diff().clip(upper=0).mean())))) if x.count() >= 14 else 50)
+def fetch_orderbook(symbol=KUCOIN_SYMBOL):
+    try:
+        url = f"{API_BASE}/api/v1/market/orderbook/level2_100?symbol={symbol}"
+        res = requests.get(url)
+        res.raise_for_status()
+        data = res.json().get("data", {})
 
-    return df[["close", "vwap", "rsi", "volume"]].tail(20)
+        bids = sum(float(entry[1]) for entry in data.get("bids", []))
+        asks = sum(float(entry[1]) for entry in data.get("asks", []))
+
+        return {"bids": bids, "asks": asks}
+
+    except Exception as e:
+        print(f"[KuCoin Orderbook ERROR] {e}")
+        return {"bids": 1, "asks": 1}
