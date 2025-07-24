@@ -19,23 +19,22 @@ TIMEFRAME_MAP = {
     "4h": "4hour"
 }
 
-def get_multi_tf_ohlcv(symbol: str, timeframe: str):
+def get_multi_tf_ohlcv(symbol: str, tf_key: str):
     """
-    Fetch OHLCV data for a given trading pair and timeframe from KuCoin.
-    Returns a pandas DataFrame with [timestamp, open, high, low, close, volume].
+    Fetches OHLCV data for a specific symbol and mapped KuCoin timeframe key (e.g., '1m', '5m').
+    Returns DataFrame or None.
     """
     try:
-        tf_code = TIMEFRAME_MAP.get(timeframe)
-        if not tf_code:
-            print(f"[KUCOIN ERROR] Unsupported timeframe: {timeframe}")
+        if tf_key not in TIMEFRAME_MAP:
+            print(f"[KUCOIN ERROR] Unsupported timeframe: {tf_key}")
             return None
 
+        tf_code = TIMEFRAME_MAP[tf_key]
         market = symbol.replace("/", "-").upper()  # e.g., BTC/USDT -> BTC-USDT
 
         end_time = int(datetime.utcnow().timestamp())
-        start_time = end_time - 2 * 24 * 60 * 60  # last 2 days in seconds
+        start_time = end_time - 60 * 60 * 48  # last 48 hours
 
-        url = f"{KUCOIN_API_BASE}/api/v1/market/candles"
         params = {
             "symbol": market,
             "type": tf_code,
@@ -43,11 +42,12 @@ def get_multi_tf_ohlcv(symbol: str, timeframe: str):
             "endAt": end_time
         }
 
+        url = f"{KUCOIN_API_BASE}/api/v1/market/candles"
         response = requests.get(url, headers=HEADERS, params=params)
         data = response.json()
 
-        if data.get("code") != "200000" or "data" not in data or not data["data"]:
-            print(f"[KUCOIN ERROR] No data returned for {symbol} {timeframe}. Full response: {data}")
+        if data.get("code") != "200000" or not data.get("data"):
+            print(f"[KUCOIN ERROR] No data returned for {symbol} {tf_key}. Full response: {data}")
             return None
 
         df = pd.DataFrame(data["data"], columns=[
@@ -59,5 +59,5 @@ def get_multi_tf_ohlcv(symbol: str, timeframe: str):
         return df[["timestamp", "open", "high", "low", "close", "volume"]]
 
     except Exception as e:
-        print(f"[KUCOIN ERROR] Exception during fetch for {symbol} {timeframe}: {str(e)}")
+        print(f"[KUCOIN ERROR] Exception during fetch for {symbol} {tf_key}: {str(e)}")
         return None
