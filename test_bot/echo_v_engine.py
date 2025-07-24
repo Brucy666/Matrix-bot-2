@@ -1,5 +1,5 @@
 # echo_v_engine_v2.py
-# Multi-Timeframe AI-Powered Echo V Engine for KuCoin Sniper System
+# Multi-Timeframe AI Echo V Engine for RSI Behavior Classification
 
 import pandas as pd
 import numpy as np
@@ -24,48 +24,59 @@ def compute_smoothed_rsi(prices, period=14, smooth=2):
     rsi = 100 - (100 / (1 + rs))
     return rsi.rolling(window=smooth).mean()
 
-# --- Echo V Split Pattern Detection ---
+# --- Echo V Pattern Detection for a Single Frame ---
 def detect_echo_vsplit(df):
     try:
         ha = heikin_ashi(df)
         fast = compute_smoothed_rsi(ha['close'], period=14, smooth=2)
         slow = compute_smoothed_rsi(ha['close'], period=14, smooth=8)
 
-        fast_last, fast_prev = fast.iloc[-1], fast.iloc[-2]
-        slow_last, slow_prev = slow.iloc[-1], slow.iloc[-2]
+        fast_last = fast.iloc[-1]
+        fast_prev = fast.iloc[-2]
+        slow_last = slow.iloc[-1]
+        slow_prev = slow.iloc[-2]
 
+        # Echo logic
         if fast_prev < slow_prev and fast_last > slow_last:
-            return ("Echo V-Split Bullish", 2.0)
+            return {"status": "Echo V-Split Bullish", "strength": 2.0, "raw": (fast_last, slow_last)}
         elif fast_prev > slow_prev and fast_last < slow_last:
-            return ("Echo V-Split Bearish", 2.0)
+            return {"status": "Echo V-Split Bearish", "strength": 2.0, "raw": (fast_last, slow_last)}
         elif abs(fast_last - slow_last) < 1.5 and abs(fast_prev - slow_prev) < 1.5:
-            return ("Echo Sync Flat", 1.0)
+            return {"status": "Echo Sync Flat", "strength": 1.0, "raw": (fast_last, slow_last)}
         elif fast_last > slow_last and fast_prev > slow_prev:
-            return ("Echo Sync Up", 1.5)
+            return {"status": "Echo Sync Up", "strength": 1.5, "raw": (fast_last, slow_last)}
         elif fast_last < slow_last and fast_prev < slow_prev:
-            return ("Echo Sync Down", 1.5)
+            return {"status": "Echo Sync Down", "strength": 1.5, "raw": (fast_last, slow_last)}
         elif fast_last < 20 and fast_prev < 30 and slow_last < 30:
-            return ("Echo Collapse Bearish", 1.8)
+            return {"status": "Echo Collapse Bearish", "strength": 1.8, "raw": (fast_last, slow_last)}
         elif fast_last > 80 and fast_prev > 70 and slow_last > 70:
-            return ("Echo Collapse Bullish", 1.8)
+            return {"status": "Echo Collapse Bullish", "strength": 1.8, "raw": (fast_last, slow_last)}
 
-        return ("None", 0.0)
+        return {"status": "None", "strength": 0.0, "raw": (fast_last, slow_last)}
     except Exception as e:
         print("[Echo Engine ERROR]", e)
-        return ("Error", 0.0)
+        return {"status": "Error", "strength": 0.0, "raw": (None, None)}
 
-# --- Full Multi-Timeframe Echo Analyzer ---
-def get_multi_tf_echo_signals(tf_data_map):
-    report = {}
-    total_score = 0
-    total_frames = 0
-
+# --- Multi-Timeframe Echo V Aggregator ---
+def get_multi_tf_echo_signals(tf_data_map: dict) -> dict:
+    results = []
     for tf, df in tf_data_map.items():
-        signal, score = detect_echo_vsplit(df)
-        report[tf] = {"status": signal, "strength": score}
-        if signal != "None" and signal != "Error":
-            total_score += score
-            total_frames += 1
+        if isinstance(df, pd.DataFrame) and len(df) >= 20:
+            signal = detect_echo_vsplit(df)
+            signal['timeframe'] = tf
+            results.append(signal)
 
-    average_score = round(total_score / total_frames, 2) if total_frames else 0.0
-    return report, average_score
+    grouped = {}
+    for r in results:
+        key = r['status']
+        if key not in grouped:
+            grouped[key] = []
+        grouped[key].append((r['timeframe'], r['strength']))
+
+    best = max(results, key=lambda x: x['strength'], default={"status": "None", "strength": 0.0})
+    return {
+        "summary": grouped,
+        "strongest": best['status'],
+        "confidence": round(best['strength'], 2),
+        "debug": results
+    }
