@@ -1,6 +1,6 @@
 # test_bot/kucoin_echo_sniper.py
 
-from kucoin_feed import get_multi_ohlcv
+from kucoin_feed import get_multi_tf_ohlcv
 from echo_v_engine import get_multi_tf_echo_signals
 from discord_alert import send_discord_alert
 from trap_journal import log_sniper_event
