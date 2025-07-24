@@ -1,66 +1,58 @@
 # kucoin_feed.py
-# Data feed module for test bot (Echo V + other tools)
+# KuCoin data fetcher for sniper engine (patched for timestamp parsing)
 
 import pandas as pd
 import requests
+from datetime import datetime
 import os
-import numpy as np
 
 KUCOIN_SYMBOL = "BTC-USDT"
-API_BASE = "https://api.kucoin.com"
-
-def fetch_klines(symbol=KUCOIN_SYMBOL, interval='1min', limit=100):
-    try:
-        url = f"{API_BASE}/api/v1/market/candles?type={interval}&symbol={symbol}&limit={limit}"
-        res = requests.get(url)
-        res.raise_for_status()
-        data = res.json().get("data", [])
-
-        if not data:
-            print("[KuCoin FEED] No Kline data returned.")
-            return None
-
-        df = pd.DataFrame(data, columns=["timestamp", "open", "close", "high", "low", "volume", "_"])
-        df = df.iloc[::-1]  # Reverse to chronological order
-
-        # Convert to floats and timestamp
-        for col in ["open", "high", "low", "close", "volume"]:
-            df[col] = df[col].astype(float)
-        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
-
-        # Calculate RSI
-        delta = df["close"].diff()
-        gain = delta.clip(lower=0)
-        loss = -delta.clip(upper=0)
-        avg_gain = gain.rolling(window=14).mean()
-        avg_loss = loss.rolling(window=14).mean()
-        rs = avg_gain / avg_loss
-        df["rsi"] = 100 - (100 / (1 + rs))
-
-        # Calculate simple VWAP for context
-        df["vwap"] = (df["high"] + df["low"] + df["close"]) / 3
-
-        return df.dropna().reset_index(drop=True)
-
-    except Exception as e:
-        print(f"[KuCoin FEED ERROR] {e}")
-        return None
+KUCOIN_LIMIT = 100
+KUCOIN_ENDPOINT = f"https://api.kucoin.com/api/v1/market/candles?type=1min&symbol={KUCOIN_SYMBOL}&limit={KUCOIN_LIMIT}"
 
 def get_kucoin_sniper_feed():
-    return fetch_klines()
-
-def fetch_orderbook(symbol=KUCOIN_SYMBOL):
     try:
-        url = f"{API_BASE}/api/v1/market/orderbook/level2_100?symbol={symbol}"
-        res = requests.get(url)
-        res.raise_for_status()
-        data = res.json().get("data", {})
+        res = requests.get(KUCOIN_ENDPOINT)
+        data = res.json()
 
-        bids = sum(float(entry[1]) for entry in data.get("bids", []))
-        asks = sum(float(entry[1]) for entry in data.get("asks", []))
+        if data["code"] != "200":
+            print("[KuCoin ERROR] API error:", data.get("msg", "Unknown"))
+            return None
 
-        return {"bids": bids, "asks": asks}
+        candles = data["data"]
+        df = pd.DataFrame(candles, columns=[
+            "timestamp", "open", "close", "high", "low", "volume", "turnover"
+        ])
+        df = df.iloc[::-1].copy()  # Reverse to oldest → newest
+        df[["open", "close", "high", "low", "volume"]] = df[["open", "close", "high", "low", "volume"]].astype(float)
+        df["timestamp"] = pd.to_datetime(df["timestamp"].astype("int64"), unit="ms")
+
+        # RSI Calculation
+        df["delta"] = df["close"].diff()
+        df["gain"] = df["delta"].clip(lower=0)
+        df["loss"] = -df["delta"].clip(upper=0)
+        df["avg_gain"] = df["gain"].rolling(14).mean()
+        df["avg_loss"] = df["loss"].rolling(14).mean()
+        rs = df["avg_gain"] / df["avg_loss"]
+        df["rsi"] = 100 - (100 / (1 + rs))
+
+        # VWAP Approx (volume-weighted price)
+        df["vwap"] = (df["close"] * df["volume"]).cumsum() / df["volume"].cumsum()
+
+        return df.dropna()
 
     except Exception as e:
-        print(f"[KuCoin Orderbook ERROR] {e}")
-        return {"bids": 1, "asks": 1}
+        print("[KuCoin FEED ERROR]", e)
+        return None
+
+
+def fetch_orderbook():
+    try:
+        url = f"https://api.kucoin.com/api/v1/market/orderbook/level2_100?symbol={KUCOIN_SYMBOL}"
+        res = requests.get(url).json()
+        bids = sum(float(x[1]) for x in res["data"]["bids"])
+        asks = sum(float(x[1]) for x in res["data"]["asks"])
+        return {"bids": bids, "asks": asks}
+    except Exception as e:
+        print("[KuCoin Orderbook ERROR]", e)
+        return {"bids": 0, "asks": 0}
