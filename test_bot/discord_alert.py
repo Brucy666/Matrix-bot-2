@@ -1,28 +1,49 @@
-# discord_alert.py
-import requests
+# test_bot/discord_alert.py
+
 import os
-from datetime import datetime
+import requests
+import json
 
-DISCORD_WEBHOOK = os.getenv("TEST_DISCORD_WEBHOOK")
+# Load webhook URL from Railway environment
+DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
 
-def send_discord_alert(trade_data):
+def send_discord_alert(data: dict):
     if not DISCORD_WEBHOOK:
-        print("[!] No webhook set.")
+        print("[!] No webhook set. Skipping Discord alert.")
         return
 
-    symbol = trade_data.get("symbol", "N/A")
-    status = trade_data.get("rsi_status", "None")
-    price = trade_data.get("entry_price", 0)
-    confidence = trade_data.get("confidence", 0)
-    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
-
-    content = f"🧪 Test Sniper Signal\n**{symbol}** at `{price}`\nRSI Signal: `{status}`\nConfidence: `{confidence}`\n`{timestamp}`"
-
     try:
-        res = requests.post(DISCORD_WEBHOOK, json={"content": content})
-        if res.status_code in [200, 204]:
-            print("[✓] Test alert sent to Discord.")
+        # Format alert content
+        message = {
+            "username": "Echo V Test Bot",
+            "content": "📡 **Echo V Alert**",
+            "embeds": [
+                {
+                    "title": f"📈 {data.get('symbol', 'Unknown')} – {data.get('exchange', 'Test')}",
+                    "color": 3447003,  # Blue
+                    "fields": [
+                        {"name": "Entry Price", "value": str(data.get("entry_price", "N/A")), "inline": True},
+                        {"name": "VWAP", "value": str(data.get("vwap", "N/A")), "inline": True},
+                        {"name": "RSI", "value": str(round(data.get("rsi", 0), 2)), "inline": True},
+                        {"name": "Spoof Ratio", "value": str(data.get("spoof_ratio", "N/A")), "inline": True},
+                        {"name": "Echo V Signal", "value": data.get("rsi_status", "None"), "inline": True},
+                        {"name": "Score", "value": str(data.get("score", "0.0")), "inline": True},
+                        {"name": "Confidence", "value": str(data.get("confidence", "0.0")), "inline": True},
+                        {"name": "Reasons", "value": "\n".join(data.get("reasons", [])) or "None", "inline": False}
+                    ],
+                    "footer": {
+                        "text": f"⏱ {data.get('timestamp', '')}"
+                    }
+                }
+            ]
+        }
+
+        # Send alert
+        response = requests.post(DISCORD_WEBHOOK, json=message)
+        if response.status_code != 204:
+            print(f"[!] Discord webhook error: {response.status_code} - {response.text}")
         else:
-            print(f"[!] Discord error: {res.status_code}, {res.text}")
+            print("[✓] Discord alert sent.")
+
     except Exception as e:
-        print(f"[!] Discord exception: {e}")
+        print(f"[Webhook ERROR] {e}")
