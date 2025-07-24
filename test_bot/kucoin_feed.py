@@ -2,53 +2,48 @@
 
 import requests
 import pandas as pd
-from datetime import datetime, timedelta
+import os
+import json
 
 KUCOIN_API_BASE = "https://api.kucoin.com"
+
+# Fallback mock file path
+FALLBACK_DATA_DIR = "test_data"
+
+# Hardcoded fallback timeframes for stability
+TIMEFRAME_MAP = {
+    "15m": "15min"
+}
 
 HEADERS = {
     "Accept": "application/json",
     "Content-Type": "application/json"
 }
 
-TIMEFRAME_MAP = {
-    "1m": "1min",
-    "5m": "5min",
-    "15m": "15min",
-    "1h": "1hour",
-    "4h": "4hour"
-}
-
-def get_multi_tf_ohlcv(symbol: str, tf_key: str):
+def get_multi_tf_ohlcv(symbol: str, timeframe: str):
     """
-    Fetches OHLCV data for a specific symbol and mapped KuCoin timeframe key (e.g., '1m', '5m').
-    Returns DataFrame or None.
+    Attempt to fetch OHLCV data from KuCoin API, else load from fallback file.
     """
     try:
-        if tf_key not in TIMEFRAME_MAP:
-            print(f"[KUCOIN ERROR] Unsupported timeframe: {tf_key}")
+        kucoin_tf = TIMEFRAME_MAP.get(timeframe)
+        if not kucoin_tf:
+            print(f"[KUCOIN ERROR] Unsupported timeframe: {timeframe}")
             return None
 
-        tf_code = TIMEFRAME_MAP[tf_key]
-        market = symbol.replace("/", "-").upper()  # e.g., BTC/USDT -> BTC-USDT
-
-        end_time = int(datetime.utcnow().timestamp())
-        start_time = end_time - 60 * 60 * 48  # last 48 hours
-
+        market = symbol.replace("/", "-").upper()
+        endpoint = "/api/v1/market/candles"
         params = {
+            "type": kucoin_tf,
             "symbol": market,
-            "type": tf_code,
-            "startAt": start_time,
-            "endAt": end_time
+            "startAt": int(pd.Timestamp.utcnow().timestamp()) - 3600 * 24 * 2,
         }
 
-        url = f"{KUCOIN_API_BASE}/api/v1/market/candles"
+        url = f"{KUCOIN_API_BASE}{endpoint}"
         response = requests.get(url, headers=HEADERS, params=params)
         data = response.json()
 
-        if data.get("code") != "200000" or not data.get("data"):
-            print(f"[KUCOIN ERROR] No data returned for {symbol} {tf_key}. Full response: {data}")
-            return None
+        if not data.get("data"):
+            raise ValueError("Empty data")
 
         df = pd.DataFrame(data["data"], columns=[
             "timestamp", "open", "close", "high", "low", "volume", "turnover"
@@ -59,5 +54,26 @@ def get_multi_tf_ohlcv(symbol: str, tf_key: str):
         return df[["timestamp", "open", "high", "low", "close", "volume"]]
 
     except Exception as e:
-        print(f"[KUCOIN ERROR] Exception during fetch for {symbol} {tf_key}: {str(e)}")
+        print(f"[KUCOIN ERROR] API failed for {symbol} {timeframe}: {e}")
+        return load_fallback_ohlcv(symbol, timeframe)
+
+def load_fallback_ohlcv(symbol: str, timeframe: str):
+    """
+    Load fallback OHLCV data from local JSON file.
+    """
+    try:
+        filename = f"{symbol.replace('/', '-')}_{timeframe}.json"
+        path = os.path.join(FALLBACK_DATA_DIR, filename)
+        with open(path, "r") as f:
+            raw = json.load(f)
+
+        df = pd.DataFrame(raw)
+        df["timestamp"] = pd.to_datetime(df["timestamp"])
+        df = df.sort_values("timestamp")
+
+        print(f"[FALLBACK] Loaded {len(df)} candles for {symbol} {timeframe}")
+        return df
+
+    except Exception as e:
+        print(f"[FALLBACK ERROR] Could not load fallback for {symbol} {timeframe}: {e}")
         return None
