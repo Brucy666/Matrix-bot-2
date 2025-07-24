@@ -1,53 +1,82 @@
 # kucoin_feed.py
-# Unified KuCoin data fetcher for Echo V AI & RSI-V engines
-
 import requests
 import pandas as pd
-import os
+from datetime import datetime
+import numpy as np
 
-API_KEY = os.getenv("KUCOIN_API_KEY")
-BASE_URL = "https://api.kucoin.com/api/v1"
+KUCOIN_API_KEY = "your_key_here"  # Replace if needed or pull from environment
 
-HEADERS = {
-    "Accept": "application/json",
-    "KC-API-KEY": API_KEY,
-}
+# ---- Configurable Timeframes ----
+TIMEFRAMES = ["1m", "5m", "15m", "1h", "4h"]
 
-def get_kucoin_sniper_feed(symbol="BTC-USDT", interval="1m", limit=150):
-    url = f"{BASE_URL}/market/candles?type={interval}&symbol={symbol}&limit={limit}"
+# ---- Fetch KuCoin OHLCV for a given timeframe ----
+def fetch_ohlcv(symbol="BTC/USDT", interval="1m", limit=150):
     try:
-        res = requests.get(url, headers=HEADERS)
-        data = res.json()["data"]
+        base = f"https://api.kucoin.com/api/v1/market/candles?type={interval}&symbol={symbol.replace('/', '-')}&limit={limit}"
+        response = requests.get(base)
+        raw = response.json()
 
-        df = pd.DataFrame(data, columns=[
+        if "data" not in raw or not raw["data"]:
+            print(f"[KUCOIN ERROR] No data returned for {interval}")
+            return None
+
+        # Convert to DataFrame
+        df = pd.DataFrame(raw["data"], columns=[
             "timestamp", "open", "close", "high", "low", "volume", "turnover"
         ])
-        df = df.iloc[::-1].copy()
-        df["timestamp"] = pd.to_datetime(pd.to_numeric(df["timestamp"]), unit="ms")
-        df[["open", "close", "high", "low", "volume"]] = df[["open", "close", "high", "low", "volume"]].astype(float)
-        df["vwap"] = (df["high"] + df["low"] + df["close"]) / 3
+
+        df = df[::-1].copy()  # oldest to newest
+        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+        df[["open", "high", "low", "close", "volume"]] = df[["open", "high", "low", "close", "volume"]].astype(float)
         return df
 
     except Exception as e:
-        print("[KUCOIN ERROR]", e)
+        print(f"[KUCOIN ERROR] Failed to fetch {interval} OHLCV:", e)
         return None
 
-def get_multi_ohlcv(symbol="BTC-USDT", intervals=["1m", "5m", "15m", "1h", "4h"], limit=150):
-    tf_data = {}
-    for tf in intervals:
-        df = get_kucoin_sniper_feed(symbol=symbol, interval=tf, limit=limit)
-        if df is not None and not df.empty:
-            tf_data[tf] = df
-    return tf_data
+# ---- RSI Calculation ----
+def calculate_rsi(series, period=14):
+    delta = series.diff()
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+    avg_gain = gain.rolling(period).mean()
+    avg_loss = loss.rolling(period).mean()
+    rs = avg_gain / avg_loss
+    rsi = 100 - (100 / (1 + rs))
+    return rsi
 
-def fetch_orderbook(symbol="BTC-USDT"):
+# ---- Main Feed Generator for Multi-Timeframe ----
+def get_multi_ohlcv(symbol="BTC/USDT"):
     try:
-        url = f"{BASE_URL}/market/orderbook/level2_20?symbol={symbol}"
-        res = requests.get(url, headers=HEADERS)
-        data = res.json()["data"]
-        bids = sum(float(b[1]) for b in data["bids"])
-        asks = sum(float(a[1]) for a in data["asks"])
-        return {"bids": bids, "asks": asks}
+        tf_data_map = {}
+        base_df = None
+
+        for tf in TIMEFRAMES:
+            df = fetch_ohlcv(symbol, interval=tf)
+            if df is not None:
+                df["rsi"] = calculate_rsi(df["close"])
+                tf_data_map[tf] = df
+                if tf == "1m":
+                    base_df = df
+
+        if base_df is None or len(base_df) < 10:
+            print("[KUCOIN TEST ERROR] Base timeframe data (1m) invalid.")
+            return None
+
+        last_close = float(base_df["close"].iloc[-1])
+        vwap = np.average(base_df["close"], weights=base_df["volume"])
+        rsi_now = float(base_df["rsi"].iloc[-1])
+        bias = "Above" if last_close > vwap else "Below"
+
+        return {
+            "price": last_close,
+            "vwap": round(vwap, 2),
+            "rsi": round(rsi_now, 2),
+            "spoof": 0.0,  # placeholder, override later
+            "bias": bias,
+            "ohlcv": tf_data_map
+        }
+
     except Exception as e:
-        print("[ORDERBOOK ERROR]", e)
-        return {"bids": 1.0, "asks": 1.0}
+        print("[KUCOIN TEST ERROR]", str(e))
+        return None
