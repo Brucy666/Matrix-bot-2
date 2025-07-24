@@ -1,46 +1,53 @@
-# test_bot/kucoin_feed.py
+# kucoin_feed.py
+# Unified KuCoin data fetcher for Echo V AI & RSI-V engines
 
 import requests
 import pandas as pd
-import time
 import os
 
-KUCOIN_API_KEY = os.getenv("KUCOIN_API_KEY")
-SYMBOL = "BTC-USDT"
+API_KEY = os.getenv("KUCOIN_API_KEY")
+BASE_URL = "https://api.kucoin.com/api/v1"
 
-def fetch_klines(symbol, interval, limit=150):
-    url = f"https://api.kucoin.com/api/v1/market/candles?type={interval}&symbol={symbol}&limit={limit}"
-    headers = {"KC-API-KEY": KUCOIN_API_KEY} if KUCOIN_API_KEY else {}
+HEADERS = {
+    "Accept": "application/json",
+    "KC-API-KEY": API_KEY,
+}
+
+def get_kucoin_sniper_feed(symbol="BTC-USDT", interval="1m", limit=150):
+    url = f"{BASE_URL}/market/candles?type={interval}&symbol={symbol}&limit={limit}"
     try:
-        resp = requests.get(url, headers=headers, timeout=10)
-        data = resp.json()
-        if data.get("code") != "200000":
-            print(f"[KUCOIN ERROR] Response code: {data.get('code')}")
-            return None
-        rows = data["data"]
-        df = pd.DataFrame(rows, columns=[
+        res = requests.get(url, headers=HEADERS)
+        data = res.json()["data"]
+
+        df = pd.DataFrame(data, columns=[
             "timestamp", "open", "close", "high", "low", "volume", "turnover"
         ])
-        df = df.iloc[::-1]  # Reverse order: oldest → newest
-        df["timestamp"] = pd.to_numeric(df["timestamp"], errors="coerce")
-        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
-        df[["open", "high", "low", "close", "volume"]] = df[["open", "high", "low", "close", "volume"]].astype(float)
+        df = df.iloc[::-1].copy()
+        df["timestamp"] = pd.to_datetime(pd.to_numeric(df["timestamp"]), unit="ms")
+        df[["open", "close", "high", "low", "volume"]] = df[["open", "close", "high", "low", "volume"]].astype(float)
+        df["vwap"] = (df["high"] + df["low"] + df["close"]) / 3
         return df
+
     except Exception as e:
-        print(f"[KUCOIN ERROR] API error: {e}")
+        print("[KUCOIN ERROR]", e)
         return None
 
-def get_multi_tf_kucoin_data():
-    timeframes = {
-        "1m": "1min",
-        "5m": "5min",
-        "15m": "15min",
-        "1h": "1hour",
-        "4h": "4hour"
-    }
-    data_map = {}
-    for label, interval in timeframes.items():
-        df = fetch_klines(SYMBOL, interval)
-        if df is not None and len(df) > 20:
-            data_map[label] = df
-    return data_map
+def get_multi_ohlcv(symbol="BTC-USDT", intervals=["1m", "5m", "15m", "1h", "4h"], limit=150):
+    tf_data = {}
+    for tf in intervals:
+        df = get_kucoin_sniper_feed(symbol=symbol, interval=tf, limit=limit)
+        if df is not None and not df.empty:
+            tf_data[tf] = df
+    return tf_data
+
+def fetch_orderbook(symbol="BTC-USDT"):
+    try:
+        url = f"{BASE_URL}/market/orderbook/level2_20?symbol={symbol}"
+        res = requests.get(url, headers=HEADERS)
+        data = res.json()["data"]
+        bids = sum(float(b[1]) for b in data["bids"])
+        asks = sum(float(a[1]) for a in data["asks"])
+        return {"bids": bids, "asks": asks}
+    except Exception as e:
+        print("[ORDERBOOK ERROR]", e)
+        return {"bids": 1.0, "asks": 1.0}
