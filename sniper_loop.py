@@ -1,9 +1,16 @@
 # sniper_loop.py
+
 import time
+import os
 from btc_sniper_engine import run_btc_sniper
 from bybit_sniper_engine import run_bybit_sniper
 from binance_sniper_engine import run_binance_sniper
 from okx_sniper_engine import run_okx_sniper
+
+# 🔁 Bot toggle check
+if os.getenv("BOT_ACTIVE", "true").lower() != "true":
+    print("[⏸️ BOT PAUSED] BOT_ACTIVE is set to false. Exiting sniper loop.")
+    exit()
 
 print("[LOOP 🧠] 🚀 Starting Sniper Loop Engine...")
 
