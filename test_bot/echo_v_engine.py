@@ -1,10 +1,11 @@
 # echo_v_engine.py
-# AI-powered Echo V Engine using Heikin Ashi + multi-timeframe support
+# AI-powered Echo V Engine with multi-timeframe aggregation + safe string handling
 
 import pandas as pd
 import numpy as np
+from statistics import mean
 
-# ----- Heikin Ashi Simulation -----
+# --- Heikin Ashi Simulation ---
 def heikin_ashi(df):
     ha = pd.DataFrame(index=df.index)
     ha['close'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
@@ -13,7 +14,7 @@ def heikin_ashi(df):
     ha['low'] = df[['open', 'close', 'low']].min(axis=1)
     return ha
 
-# ----- Smoothed RSI Calculation -----
+# --- Smoothed RSI ---
 def compute_smoothed_rsi(prices, period=14, smooth=2):
     delta = prices.diff()
     gain = delta.clip(lower=0)
@@ -24,7 +25,7 @@ def compute_smoothed_rsi(prices, period=14, smooth=2):
     rsi = 100 - (100 / (1 + rs))
     return rsi.rolling(window=smooth).mean()
 
-# ----- Echo V Pattern Detection -----
+# --- Echo Pattern Logic ---
 def detect_echo_vsplit(df):
     try:
         ha = heikin_ashi(df)
@@ -38,64 +39,68 @@ def detect_echo_vsplit(df):
 
         # Echo pattern logic
         if fast_prev < slow_prev and fast_last > slow_last:
-            return {"status": "Echo V-Split Bullish", "strength": 2.0}
+            return {"status": "Echo V-Split Bullish", "strength": 2.0, "reason": "Fast crossed above Slow"}
         elif fast_prev > slow_prev and fast_last < slow_last:
-            return {"status": "Echo V-Split Bearish", "strength": 2.0}
+            return {"status": "Echo V-Split Bearish", "strength": 2.0, "reason": "Fast crossed below Slow"}
         elif abs(fast_last - slow_last) < 1.5 and abs(fast_prev - slow_prev) < 1.5:
-            return {"status": "Echo Sync Flat", "strength": 1.0}
+            return {"status": "Echo Sync Flat", "strength": 1.0, "reason": "Fast/Slow tracking closely"}
         elif fast_last > slow_last and fast_prev > slow_prev:
-            return {"status": "Echo Sync Up", "strength": 1.5}
+            return {"status": "Echo Sync Up", "strength": 1.5, "reason": "Both rising"}
         elif fast_last < slow_last and fast_prev < slow_prev:
-            return {"status": "Echo Sync Down", "strength": 1.5}
+            return {"status": "Echo Sync Down", "strength": 1.5, "reason": "Both falling"}
         elif fast_last < 20 and fast_prev < 30 and slow_last < 30:
-            return {"status": "Echo Collapse Bearish", "strength": 1.8}
+            return {"status": "Echo Collapse Bearish", "strength": 1.8, "reason": "Oversold collapse"}
         elif fast_last > 80 and fast_prev > 70 and slow_last > 70:
-            return {"status": "Echo Collapse Bullish", "strength": 1.8}
+            return {"status": "Echo Collapse Bullish", "strength": 1.8, "reason": "Overbought surge"}
 
-        return {"status": "None", "strength": 0.0}
+        return {"status": "None", "strength": 0.0, "reason": "No clear signal"}
+
     except Exception as e:
-        print("[Echo Engine ERROR]", str(e))
-        return {"status": "Error", "strength": 0.0}
+        return {"status": "Error", "strength": 0.0, "reason": str(e)}
 
-# ----- Multi-Timeframe Echo Aggregator -----
+# --- Multi-Timeframe Echo Aggregation ---
 def get_multi_tf_echo_signals(tf_data_map: dict) -> dict:
     """
-    Aggregates Echo V signals across multiple timeframes.
-    Expects: { "1m": df_1m, "3m": df_3m, "15m": df_15m, ... }
-    Returns summary with dominant signal and avg strength.
+    Expects: { "1m": df, "3m": df, ... }
+    Returns: { summary: [], bias: str, avg_strength: float }
     """
-    from statistics import mean
-
     summary = []
-    echo_types = []
+    types = []
 
     for tf, df in tf_data_map.items():
-        if df is None or len(df) < 10:
+        if df is None or len(df) < 20:
             continue
 
-        result = detect_echo_vsplit(df)
-        echo_types.append(result["status"])
+        signal = detect_echo_vsplit(df)
+        types.append(signal["status"])
         summary.append({
-            "tf": tf,
-            "signal": result["status"],
-            "strength": result["strength"]
+            "timeframe": tf,
+            "signal": signal["status"],
+            "strength": signal["strength"],
+            "reason": signal["reason"]
         })
 
     if not summary:
-        return {"summary": [], "bias": "Neutral", "avg_strength": 0.0}
+        return {
+            "summary": [],
+            "bias": "No Data",
+            "avg_strength": 0.0
+        }
 
-    types = [s["signal"] for s in summary if s["signal"] not in ["None", "Error"]]
-    grouped = {t: types.count(t) for t in set(types)}
+    valid = [s for s in summary if s["signal"] not in ["None", "Error"]]
+    if not valid:
+        return {
+            "summary": summary,
+            "bias": "Neutral",
+            "avg_strength": round(mean([s["strength"] for s in summary]), 2)
+        }
 
-    if not grouped:
-        avg = mean([s["strength"] for s in summary])
-        return {"summary": summary, "bias": "Neutral", "avg_strength": round(avg, 2)}
-
-    top_type = max(grouped, key=grouped.get)
-    confidence = mean([s["strength"] for s in summary if s["signal"] == top_type])
+    # Count top bias
+    top = max(set([v["signal"] for v in valid]), key=[v["signal"] for v in valid].count)
+    avg_strength = round(mean([v["strength"] for v in valid if v["signal"] == top]), 2)
 
     return {
         "summary": summary,
-        "bias": top_type,
-        "avg_strength": round(confidence, 2)
+        "bias": top,
+        "avg_strength": avg_strength
     }
