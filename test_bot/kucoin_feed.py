@@ -2,58 +2,61 @@
 
 import requests
 import pandas as pd
+import os
+import time
 
 KUCOIN_API_BASE = "https://api.kucoin.com"
 
-# KuCoin timeframes accepted by the API
-TIMEFRAME_MAP = {
-    "1m": "1min",
-    "5m": "5min",
-    "15m": "15min",
-    "1h": "1hour",
-    "4h": "4hour"
+HEADERS = {
+    "Accept": "application/json",
+    "Content-Type": "application/json"
 }
 
-def get_multi_tf_ohlcv(symbol: str, timeframes: list):
-    """
-    Fetch OHLCV data for multiple timeframes for a KuCoin symbol.
-    Returns a dictionary of timeframe: DataFrame or None.
-    """
+# Reliable KuCoin-supported timeframes
+TIMEFRAMES = [
+    ("1min", "1m"),
+    ("5min", "5m"),
+    ("15min", "15m"),
+    ("1hour", "1h"),
+    ("4hour", "4h")
+]
+
+def fetch_ohlcv(symbol: str, kucoin_tf: str):
+    try:
+        market = symbol.replace("/", "-").upper()  # BTC/USDT -> BTC-USDT
+        endpoint = f"/api/v1/market/candles"
+        params = {
+            "type": kucoin_tf,
+            "symbol": market,
+            "startAt": int(time.time()) - 60 * 60 * 48  # last 48h
+        }
+
+        url = f"{KUCOIN_API_BASE}{endpoint}"
+        response = requests.get(url, headers=HEADERS, params=params)
+        data = response.json()
+
+        if not data.get("data"):
+            print(f"[KUCOIN ERROR] No data returned for {kucoin_tf}. Response: {data}")
+            return None
+
+        df = pd.DataFrame(data["data"], columns=[
+            "timestamp", "open", "close", "high", "low", "volume", "turnover"])
+        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
+        df = df.sort_values("timestamp")
+
+        return df[["timestamp", "open", "high", "low", "close", "volume"]]
+
+    except Exception as e:
+        print(f"[KUCOIN ERROR] Failed to fetch OHLCV for {symbol} {kucoin_tf}: {e}")
+        return None
+
+def get_multi_tf_ohlcv(symbol: str):
     results = {}
-    market = symbol.replace("/", "-").upper()  # BTC/USDT -> BTC-USDT
-
-    for tf in timeframes:
-        kucoin_tf = TIMEFRAME_MAP.get(tf)
-        if not kucoin_tf:
-            print(f"[KUCOIN ❌] Unsupported timeframe: {tf}")
-            results[tf] = None
-            continue
-
-        try:
-            endpoint = f"/api/v1/market/candles"
-            params = {
-                "type": kucoin_tf,
-                "symbol": market,
-                "startAt": int(pd.Timestamp.utcnow().timestamp()) - 3600 * 24 * 2,
-            }
-            url = f"{KUCOIN_API_BASE}{endpoint}"
-            response = requests.get(url, params=params)
-            data = response.json()
-
-            if not data.get("data"):
-                print(f"[KUCOIN SKIP] {tf} returned no usable data.")
-                results[tf] = None
-                continue
-
-            df = pd.DataFrame(data["data"], columns=[
-                "timestamp", "open", "close", "high", "low", "volume", "turnover"
-            ])
-            df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
-            df = df.sort_values("timestamp")
-            results[tf] = df[["timestamp", "open", "high", "low", "close", "volume"]]
-
-        except Exception as e:
-            print(f"[KUCOIN ERROR] Failed to fetch {tf} for {symbol}: {e}")
-            results[tf] = None
-
+    for kucoin_tf, label in TIMEFRAMES:
+        print(f"[KUCOIN] ⏳ Fetching {label}...")
+        df = fetch_ohlcv(symbol, kucoin_tf)
+        if df is not None:
+            results[label] = df
+        else:
+            print(f"[KUCOIN SKIP] {label} returned no usable data.")
     return results
