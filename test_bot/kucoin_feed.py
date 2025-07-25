@@ -1,59 +1,59 @@
-# kucoin_feed.py (Updated Fallback Version)
+# kucoin_feed.py
 
 import requests
 import pandas as pd
-import os
 
 KUCOIN_API_BASE = "https://api.kucoin.com"
 
-HEADERS = {
-    "Accept": "application/json",
-    "Content-Type": "application/json"
+# KuCoin timeframes accepted by the API
+TIMEFRAME_MAP = {
+    "1m": "1min",
+    "5m": "5min",
+    "15m": "15min",
+    "1h": "1hour",
+    "4h": "4hour"
 }
 
-# Most reliable KuCoin timeframes
-TIMEFRAME_PRIORITY = ["1day", "4hour", "1hour"]
+def get_multi_tf_ohlcv(symbol: str, timeframes: list):
+    """
+    Fetch OHLCV data for multiple timeframes for a KuCoin symbol.
+    Returns a dictionary of timeframe: DataFrame or None.
+    """
+    results = {}
+    market = symbol.replace("/", "-").upper()  # BTC/USDT -> BTC-USDT
 
-CANDLE_COLUMNS = ["timestamp", "open", "close", "high", "low", "volume", "turnover"]
+    for tf in timeframes:
+        kucoin_tf = TIMEFRAME_MAP.get(tf)
+        if not kucoin_tf:
+            print(f"[KUCOIN ❌] Unsupported timeframe: {tf}")
+            results[tf] = None
+            continue
 
+        try:
+            endpoint = f"/api/v1/market/candles"
+            params = {
+                "type": kucoin_tf,
+                "symbol": market,
+                "startAt": int(pd.Timestamp.utcnow().timestamp()) - 3600 * 24 * 2,
+            }
+            url = f"{KUCOIN_API_BASE}{endpoint}"
+            response = requests.get(url, params=params)
+            data = response.json()
 
-def fetch_ohlcv(symbol: str, kucoin_tf: str):
-    """Fetch OHLCV data from KuCoin for a given symbol and timeframe."""
-    try:
-        market = symbol.replace("/", "-").upper()
-        endpoint = f"/api/v1/market/candles"
-        params = {
-            "type": kucoin_tf,
-            "symbol": market,
-            "startAt": int(pd.Timestamp.utcnow().timestamp()) - 3600 * 24 * 5,
-        }
-        url = f"{KUCOIN_API_BASE}{endpoint}"
-        response = requests.get(url, headers=HEADERS, params=params)
-        data = response.json()
+            if not data.get("data"):
+                print(f"[KUCOIN SKIP] {tf} returned no usable data.")
+                results[tf] = None
+                continue
 
-        if not data.get("data"):
-            print(f"[KUCOIN ERROR] No data for {kucoin_tf}. Response: {data}")
-            return None
+            df = pd.DataFrame(data["data"], columns=[
+                "timestamp", "open", "close", "high", "low", "volume", "turnover"
+            ])
+            df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
+            df = df.sort_values("timestamp")
+            results[tf] = df[["timestamp", "open", "high", "low", "close", "volume"]]
 
-        df = pd.DataFrame(data["data"], columns=CANDLE_COLUMNS)
-        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
-        df = df.sort_values("timestamp")
-        return df[["timestamp", "open", "high", "low", "close", "volume"]]
+        except Exception as e:
+            print(f"[KUCOIN ERROR] Failed to fetch {tf} for {symbol}: {e}")
+            results[tf] = None
 
-    except Exception as e:
-        print(f"[KUCOIN EXCEPTION] Failed fetch {kucoin_tf}: {e}")
-        return None
-
-
-def get_best_ohlcv(symbol: str):
-    """Try multiple fallback timeframes and return the first valid DataFrame."""
-    for tf in TIMEFRAME_PRIORITY:
-        print(f"[KUCOIN ⏳] Trying timeframe: {tf}")
-        df = fetch_ohlcv(symbol, tf)
-        if df is not None and not df.empty:
-            print(f"[KUCOIN ✅] Using {tf} timeframe with {len(df)} candles.")
-            return df
-        print(f"[KUCOIN ❌] Skipped {tf} — unusable.")
-
-    print(f"[KUCOIN TEST ERROR] No valid timeframe found. Aborting Echo V.")
-    return None
+    return results
